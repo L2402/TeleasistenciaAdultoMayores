@@ -1,0 +1,261 @@
+.citas-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.citas-header {
+  margin-bottom: 2rem;
+}
+
+.citas-header h2 {
+  color: #333;
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.citas-header p {
+  color: #666;
+  margin: 0;
+}
+
+/* Filtros */
+.filtros {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filtro-btn {
+  padding: 0.6rem 1.5rem;
+  border: 2px solid #e0e0e0;
+  background: white;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.3s;
+}
+
+.filtro-btn:hover {
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.filtro-btn.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* Grid de citas */
+.citas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Tarjeta de cita */
+.cita-card {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.cita-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+.cita-header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.estado-badge {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.estado-confirmada {
+  background: #d4edda;
+  color: #155724;
+}
+
+.estado-pendiente {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.estado-completada {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.especialidad {
+  color: #007bff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Información de la cita */
+.cita-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.info-row .icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.info-row .label {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0 0 0.2rem 0;
+  font-weight: 500;
+}
+
+.info-row .value {
+  font-size: 0.95rem;
+  color: #333;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Acciones */
+.cita-actions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.cita-actions button {
+  flex: 1;
+  padding: 0.7rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  min-width: 100px;
+}
+
+.btn-confirmar {
+  background: #28a745;
+  color: white;
+}
+
+.btn-confirmar:hover {
+  background: #218838;
+}
+
+.btn-cancelar {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-cancelar:hover {
+  background: #c82333;
+}
+
+.btn-recordatorio {
+  background: #ffc107;
+  color: #333;
+}
+
+.btn-recordatorio:hover {
+  background: #e0a800;
+}
+
+.btn-ver-detalle {
+  background: #6c757d;
+  color: white;
+  width: 100%;
+}
+
+.btn-ver-detalle:hover {
+  background: #5a6268;
+}
+
+/* Sin citas */
+.no-citas {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 15px;
+  color: #666;
+}
+
+/* Botón nueva cita */
+.btn-nueva-cita {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 1rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-nueva-cita span {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.btn-nueva-cita:hover {
+  background: #0056b3;
+  transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .citas-container {
+    padding: 1rem;
+  }
+
+  .citas-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filtros {
+    justify-content: center;
+  }
+
+  .cita-actions {
+    flex-direction: column;
+  }
+
+  .cita-actions button {
+    width: 100%;
+  }
+}
