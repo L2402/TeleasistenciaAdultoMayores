@@ -59,6 +59,7 @@ body {
 
 .form-group {
   margin-bottom: 25px;
+  position: relative;
 }
 
 .form-group label {
@@ -166,4 +167,29 @@ button[type="submit"]:hover {
   .sistema-nombre {
     font-size: 1.5rem;
   }
+}
+
+.Boton-Password {
+  position: absolute;
+  right: 8px;
+  top: 65%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: #555;
+  font-size: 16px;
+  line-height: 1;
+  /* Opcional: añade un poco de tamaño para mejor clickabilidad */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.Boton-Password:hover {
+color: #333;
+background: transparent;
 }

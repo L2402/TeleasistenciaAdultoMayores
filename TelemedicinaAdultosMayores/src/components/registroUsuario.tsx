@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../styles/registroUsuario.css";
+import { Eye, EyeClosed } from 'lucide-react';
 
 const RegistroUsuario = () => {
+
+    const [mostrarPassword, setMostrarPassword] = useState(false);
+
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -90,7 +94,7 @@ const RegistroUsuario = () => {
                     <div className='form-group'>
                         <label>Contraseña:</label>
                         <input 
-                            type="password" 
+                            type={mostrarPassword ? "text" : "password"} 
                             name="contraseña" 
                             value={formData.contraseña} 
                             onChange={handleChange}  
@@ -98,6 +102,15 @@ const RegistroUsuario = () => {
                             className={errors.contraseña ? "input-error" : ""}
                         />
                         {errors.contraseña && <p className="error-message">La contraseña es obligatoria</p>}
+
+                        <button
+                            className="Boton-Password"
+                            type="button"
+                            aria-label={mostrarPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                            onClick={() => setMostrarPassword(!mostrarPassword)}
+                        >
+                            {mostrarPassword ? <Eye/> : <EyeClosed/>}
+                        </button>
                     </div>
                     <div className='form-group'>
                         <label>Correo Electrónico:</label>

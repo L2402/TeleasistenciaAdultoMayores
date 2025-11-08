@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeClosed } from "lucide-react";
 import "../styles/login.css"
 
 const Login = () => {
@@ -7,17 +8,16 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [errorNombre, setErrorNombre] = useState(false);
     const [errorPassword, setErrorPassword] = useState(false);
+    const [mostrarPassword, setMostrarPassword] = useState(false); // nuevo estado
 
     const navigate = useNavigate();
     
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        // Reset errores
         setErrorNombre(false);
         setErrorPassword(false);
         
-        // Validar campos específicos
         let hayError = false;
         
         if (nombre === "") {
@@ -62,13 +62,24 @@ const Login = () => {
                     <div className="form-group">
                         <label>Contraseña:</label>
                         <input 
-                            type="password" 
+                            type={mostrarPassword ? "text" : "password"} 
                             value={password} 
                             onChange={e => setPassword(e.target.value)} 
                             placeholder="Ingrese su contraseña"
                             className={errorPassword ? "input-error" : ""}
                         />
+                        
                         {errorPassword && <p className="error-message">El campo contraseña es obligatorio</p>}
+
+                        <button
+                            className="Boton-Password"
+                            type="button"
+                            aria-label={mostrarPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                            onClick={() => setMostrarPassword(!mostrarPassword)}
+                            
+                        >
+                            {mostrarPassword ? <Eye/> : <EyeClosed/>}
+                        </button>
                     </div>
                     
                     <button type="submit">Iniciar Sesión</button>
