@@ -3,6 +3,11 @@ import { Routes, Route } from "react-router-dom";
 import Login from "./components/login";
 import RegistroUsuario from "./components/registroUsuario";
 import Sidebar from "./components/sidebar";
+import Footer from "./components/Footer";
+
+// Páginas de recuperación
+import RecuperarUsuario from "./pages/RecuperarUsuario/RecuperarUsuario";
+import RecuperarPassword from "./pages/RecuperarPassword/RecuperarPassword";
 
 // páginas del adulto mayor
 import HomeAdulto from "./pages/adultoMayor/HomeAdulto";
@@ -11,61 +16,80 @@ import Monitoreo from "./pages/adultoMayor/Monitoreo";
 import Mensajes from "./pages/adultoMayor/Mensajes";
 import Perfil from "./pages/adultoMayor/Perfil";
 
-// páginas del médico (ejemplo)
+// páginas del médico
 import PanelMedico from "./pages/medico/PanelMedico";
 import Pacientes from "./pages/medico/Pacientes";
 import Reportes from "./pages/medico/Reportes";
 
-// páginas del cuidador (ejemplo)
+// páginas del cuidador
 import InicioCuidador from "./pages/cuidador/InicioCuidador";
 import Adultos from "./pages/cuidador/Adultos";
 
+//  Páginas legales
+import PoliticaPrivacidad from "./pages/legal/PoliticaPrivacidad";
+import TerminosCondiciones from "./pages/legal/TerminosCondiciones";
+import PreguntasFrecuentes from "./pages/legal/PreguntasFrecuentes";
+import Contacto from "./pages/legal/Contacto";
+
 const App: React.FC = () => {
-  // 👇 esto será dinámico (por ahora puedes simularlo)
   const rol = localStorage.getItem("rol") || "adultoMayor";
 
-  // --- layout base con sidebar dinámico ---
+  // Layout base con sidebar y footer
   const Layout = () => (
-    <div style={{ display: "flex" }}>
-      <Sidebar rol={rol as "adultoMayor" | "medico" | "cuidador"} />
-      <div style={{ flex: 1, padding: "1rem" }}>
-        <Routes>
-          {rol === "adultoMayor" && (
-            <>
-              <Route path="/home" element={<HomeAdulto />} />
-              <Route path="/citas" element={<Citas />} />
-              <Route path="/monitoreo" element={<Monitoreo />} />
-              <Route path="/mensajes" element={<Mensajes />} />
-              <Route path="/perfil" element={<Perfil />} />
-            </>
-          )}
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <div style={{ display: "flex", flex: 1 }}>
+        <Sidebar rol={rol as "adultoMayor" | "medico" | "cuidador"} />
+        <div style={{ flex: 1, padding: "1rem", display: "flex", flexDirection: "column" }}>
+          <div style={{ flex: 1 }}>
+            <Routes>
+              {rol === "adultoMayor" && (
+                <>
+                  <Route path="/home" element={<HomeAdulto />} />
+                  <Route path="/citas" element={<Citas />} />
+                  <Route path="/monitoreo" element={<Monitoreo />} />
+                  <Route path="/mensajes" element={<Mensajes />} />
+                  <Route path="/perfil" element={<Perfil />} />
+                </>
+              )}
 
-          {rol === "medico" && (
-            <>
-              <Route path="/home" element={<PanelMedico />} />
-              <Route path="/usuarios" element={<Pacientes />} />
-              <Route path="/reportes" element={<Reportes />} />
-            </>
-          )}
+              {rol === "medico" && (
+                <>
+                  <Route path="/home" element={<PanelMedico />} />
+                  <Route path="/usuarios" element={<Pacientes />} />
+                  <Route path="/reportes" element={<Reportes />} />
+                </>
+              )}
 
-          {rol === "cuidador" && (
-            <>
-              <Route path="/home" element={<InicioCuidador />} />
-              <Route path="/usuarios" element={<Adultos />} />
-            </>
-          )}
-        </Routes>
+              {rol === "cuidador" && (
+                <>
+                  <Route path="/home" element={<InicioCuidador />} />
+                  <Route path="/usuarios" element={<Adultos />} />
+                </>
+              )}
+
+              {/* Rutas de páginas legales */}
+              <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
+              <Route path="/terminos-condiciones" element={<TerminosCondiciones />} />
+              <Route path="/preguntas-frecuentes" element={<PreguntasFrecuentes />} />
+              <Route path="/contacto" element={<Contacto />} />
+            </Routes>
+          </div>
+          {/* Footer agregado */}
+          <Footer />
+        </div>
       </div>
     </div>
   );
 
   return (
     <Routes>
-      {/* rutas públicas */}
+      {/*  Rutas públicas */}
       <Route path="/" element={<Login />} />
       <Route path="/registro" element={<RegistroUsuario />} />
+      <Route path="/recuperar-usuario" element={<RecuperarUsuario />} />
+      <Route path="/recuperar-password" element={<RecuperarPassword />} />
 
-      {/* rutas privadas con sidebar */}
+      {/* Rutas privadas con sidebar y footer */}
       <Route path="/*" element={<Layout />} />
     </Routes>
   );

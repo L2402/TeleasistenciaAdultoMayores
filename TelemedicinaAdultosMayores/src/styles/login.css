@@ -193,3 +193,347 @@ button[type="submit"]:hover {
 color: #333;
 background: transparent;
 }
+
+/* ===== SECCIÓN RECUPERAR CONTRASEÑA ===== */
+.recuperar-password {
+  text-align: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.recuperar-password p {
+  color: #666;
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.link-recuperar {
+  background: none;
+  border: none;
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 0;
+  font-family: inherit;
+  transition: color 0.3s;
+}
+
+.link-recuperar:hover {
+  color: #0056b3;
+  font-weight: 600;
+}
+
+/* ===== MENSAJE DE ÉXITO RECUPERACIÓN ===== */
+.mensaje-exito-recuperar {
+  background: #d4edda;
+  border: 2px solid #28a745;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.mensaje-exito-recuperar p {
+  margin: 0.5rem 0;
+  color: #155724;
+  line-height: 1.6;
+}
+
+.mensaje-exito-recuperar strong {
+  color: #0c5460;
+}
+
+/* ===== VALIDACIONES VISUALES ===== */
+/* ===== INPUT WRAPPER PARA CONTRASEÑA ===== */
+.input-wrapper-password {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper-password input {
+  width: 100%;
+  padding-right: 45px;
+}
+
+.input-wrapper-password .Boton-Password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+}
+
+.input-wrapper-password .Boton-Password:hover {
+  color: #333;
+}
+
+/* ===== VALIDACIONES VISUALES ===== */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper input,
+.input-wrapper select {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.input-valid {
+  border-color: #28a745 !important;
+  background-color: #f0fff4;
+}
+
+.icon-check {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #28a745;
+  pointer-events: none;
+}
+
+.icon-error {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #dc3545;
+  pointer-events: none;
+}
+
+/* ===== RECORDARME ===== */
+.recordarme-container {
+  margin: 1rem 0;
+}
+
+.recordarme-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.recordarme-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.recordarme-label span {
+  user-select: none;
+}
+
+/* ===== ALERTAS ===== */
+.alerta-bloqueo {
+  background: #f8d7da;
+  border: 2px solid #dc3545;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #721c24;
+  font-weight: 600;
+}
+
+.alerta-intentos {
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+  border-radius: 8px;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #856404;
+  font-weight: 600;
+}
+
+button:disabled {
+  background-color: #6c757d !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===== MENSAJES DE ERROR Y BLOQUEO ===== */
+.mensaje-error-login {
+  background: #fee;
+  border: 2px solid #dc3545;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: #721c24;
+  font-weight: 500;
+  animation: slideDown 0.3s ease;
+}
+
+.mensaje-error-login svg {
+  flex-shrink: 0;
+  color: #dc3545;
+}
+
+.mensaje-bloqueo-login {
+  background: #fff4e6;
+  border: 2px solid #ff9800;
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin: 1rem 0;
+  display: flex;
+  gap: 1rem;
+  align-items: start;
+  animation: slideDown 0.3s ease;
+}
+
+.mensaje-bloqueo-login svg {
+  flex-shrink: 0;
+  color: #ff9800;
+  margin-top: 2px;
+}
+
+.mensaje-bloqueo-texto {
+  flex: 1;
+}
+
+.mensaje-bloqueo-texto p {
+  margin: 0.3rem 0;
+  color: #663c00;
+  line-height: 1.5;
+}
+
+.mensaje-bloqueo-texto p:first-child {
+  font-size: 1rem;
+}
+
+.mensaje-bloqueo-texto p:nth-child(2) {
+  font-size: 0.95rem;
+}
+
+.contador-bloqueo {
+  margin-top: 0.8rem !important;
+  font-size: 1rem !important;
+  color: #ff6f00 !important;
+}
+
+.contador-bloqueo strong {
+  font-size: 1.3rem;
+  color: #e65100;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== INPUT WRAPPER PARA CONTRASEÑA ===== */
+.input-wrapper-password {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper-password input {
+  width: 100%;
+  padding-right: 45px;
+}
+
+.input-wrapper-password .Boton-Password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+}
+
+.input-wrapper-password .Boton-Password:hover {
+  color: #333;
+}
+
+/* ===== VALIDACIONES VISUALES ===== */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper input,
+.input-wrapper select {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.input-valid {
+  border-color: #28a745 !important;
+  background-color: #f0fff4;
+}
+
+.icon-check {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #28a745;
+  pointer-events: none;
+}
+
+.icon-error {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #dc3545;
+  pointer-events: none;
+}
+
+/* ===== RECORDARME ===== */
+.recordarme-container {
+  margin: 1rem
+  0;
+}
+
+.recordarme-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.recordarme-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.recordarme-label span {
+  user-select: none;
+}
+
+button:disabled {
+  background-color: #6c757d !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
