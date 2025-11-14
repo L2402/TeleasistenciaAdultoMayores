@@ -20,11 +20,11 @@ body {
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 500px; /* ✅ Centrado */
-  margin: 0 auto; /* ✅ Asegurar centrado */
+  max-width: 500px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: strec;
+  align-items: stretch;
 }
 
 /* Header del sistema */
@@ -84,8 +84,12 @@ body {
   border-color: #4CAF50;
 }
 
+/* ❌ ELIMINADO: .form-group input.input-valid (color verde) */
+
+/* ✅ SOLO BORDE ROJO EN ERROR */
 .form-group input.input-error {
-  border-color: #f44336;
+  border-color: #dc3545;
+  background-color: #fff5f5;
 }
 
 button[type="submit"] {
@@ -147,51 +151,59 @@ button[type="submit"]:hover {
   color: white;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .login-card {
-    padding: 30px 25px;
-    max-width: 100%;
-  }
-
-  .sistema-nombre {
-    font-size: 1.7rem;
-  }
+/* ===== BOTÓN MOSTRAR/OCULTAR CONTRASEÑA ===== */
+.input-wrapper-password {
+  position: relative;
+  width: 100%;
 }
 
-@media (max-width: 480px) {
-  .login-card {
-    padding: 25px 20px;
-  }
-
-  .sistema-nombre {
-    font-size: 1.5rem;
-  }
+.input-wrapper-password input {
+  width: 100%;
+  padding-right: 45px;
 }
 
 .Boton-Password {
   position: absolute;
-  right: 8px;
-  top: 65%;
+  right: 10px;
+  top: 50%;
   transform: translateY(-50%);
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 0;
-  color: #555;
-  font-size: 16px;
-  line-height: 1;
-  /* Opcional: añade un poco de tamaño para mejor clickabilidad */
-  display: inline-flex;
+  padding: 5px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  color: #555;
 }
 
 .Boton-Password:hover {
-color: #333;
-background: transparent;
+  color: #333;
+  background: transparent;
+}
+
+/* ===== RECORDARME ===== */
+.recordarme-container {
+  margin: 1rem 0;
+}
+
+.recordarme-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.recordarme-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.recordarme-label span {
+  user-select: none;
 }
 
 /* ===== SECCIÓN RECUPERAR CONTRASEÑA ===== */
@@ -245,126 +257,7 @@ background: transparent;
   color: #0c5460;
 }
 
-/* ===== VALIDACIONES VISUALES ===== */
-/* ===== INPUT WRAPPER PARA CONTRASEÑA ===== */
-.input-wrapper-password {
-  position: relative;
-  width: 100%;
-}
-
-.input-wrapper-password input {
-  width: 100%;
-  padding-right: 45px;
-}
-
-.input-wrapper-password .Boton-Password {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #555;
-}
-
-.input-wrapper-password .Boton-Password:hover {
-  color: #333;
-}
-
-/* ===== VALIDACIONES VISUALES ===== */
-.input-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.input-wrapper input,
-.input-wrapper select {
-  width: 100%;
-  padding-right: 40px;
-}
-
-.input-valid {
-  border-color: #28a745 !important;
-  background-color: #f0fff4;
-}
-
-.icon-check {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #28a745;
-  pointer-events: none;
-}
-
-.icon-error {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #dc3545;
-  pointer-events: none;
-}
-
-/* ===== RECORDARME ===== */
-.recordarme-container {
-  margin: 1rem 0;
-}
-
-.recordarme-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-  color: #555;
-}
-
-.recordarme-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-.recordarme-label span {
-  user-select: none;
-}
-
-/* ===== ALERTAS ===== */
-.alerta-bloqueo {
-  background: #f8d7da;
-  border: 2px solid #dc3545;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  text-align: center;
-  color: #721c24;
-  font-weight: 600;
-}
-
-.alerta-intentos {
-  background: #fff3cd;
-  border: 2px solid #ffc107;
-  border-radius: 8px;
-  padding: 0.8rem;
-  margin-bottom: 1rem;
-  text-align: center;
-  color: #856404;
-  font-weight: 600;
-}
-
-button:disabled {
-  background-color: #6c757d !important;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* ===== MENSAJES DE ERROR Y BLOQUEO ===== */
+/* ===== MENSAJE DE ERROR MEJORADO ✅ ===== */
 .mensaje-error-login {
   background: #fee;
   border: 2px solid #dc3545;
@@ -384,6 +277,21 @@ button:disabled {
   color: #dc3545;
 }
 
+.error-titulo {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem 0;
+  color: #721c24;
+}
+
+.error-subtitulo {
+  font-size: 0.9rem;
+  margin: 0;
+  color: #721c24;
+  line-height: 1.4;
+}
+
+/* ===== MENSAJE DE BLOQUEO MEJORADO ✅ ===== */
 .mensaje-bloqueo-login {
   background: #fff4e6;
   border: 2px solid #ff9800;
@@ -412,23 +320,33 @@ button:disabled {
   line-height: 1.5;
 }
 
-.mensaje-bloqueo-texto p:first-child {
+.bloqueo-titulo {
   font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem !important;
 }
 
-.mensaje-bloqueo-texto p:nth-child(2) {
+.bloqueo-descripcion {
   font-size: 0.95rem;
+  margin-bottom: 0.3rem !important;
+}
+
+.bloqueo-instruccion {
+  font-size: 0.9rem;
+  font-style: italic;
 }
 
 .contador-bloqueo {
   margin-top: 0.8rem !important;
   font-size: 1rem !important;
   color: #ff6f00 !important;
+  font-weight: 600 !important;
 }
 
 .contador-bloqueo strong {
   font-size: 1.3rem;
   color: #e65100;
+  font-weight: 700;
 }
 
 @keyframes slideDown {
@@ -442,98 +360,31 @@ button:disabled {
   }
 }
 
-/* ===== INPUT WRAPPER PARA CONTRASEÑA ===== */
-.input-wrapper-password {
-  position: relative;
-  width: 100%;
-}
-
-.input-wrapper-password input {
-  width: 100%;
-  padding-right: 45px;
-}
-
-.input-wrapper-password .Boton-Password {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #555;
-}
-
-.input-wrapper-password .Boton-Password:hover {
-  color: #333;
-}
-
-/* ===== VALIDACIONES VISUALES ===== */
-.input-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.input-wrapper input,
-.input-wrapper select {
-  width: 100%;
-  padding-right: 40px;
-}
-
-.input-valid {
-  border-color: #28a745 !important;
-  background-color: #f0fff4;
-}
-
-.icon-check {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #28a745;
-  pointer-events: none;
-}
-
-.icon-error {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #dc3545;
-  pointer-events: none;
-}
-
-/* ===== RECORDARME ===== */
-.recordarme-container {
-  margin: 1rem
-  0;
-}
-
-.recordarme-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-  color: #555;
-}
-
-.recordarme-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-.recordarme-label span {
-  user-select: none;
-}
-
+/* ===== BOTÓN DESHABILITADO ===== */
 button:disabled {
   background-color: #6c757d !important;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .login-card {
+    padding: 30px 25px;
+    max-width: 100%;
+  }
+
+  .sistema-nombre {
+    font-size: 1.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 25px 20px;
+  }
+
+  .sistema-nombre {
+    font-size: 1.5rem;
+  }
 }

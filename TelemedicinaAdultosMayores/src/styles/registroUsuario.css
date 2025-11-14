@@ -33,7 +33,7 @@ body {
   border-radius: 15px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 700px; /* Más ancho, igual que el login */
+  max-width: 700px;
 }
 
 form {
@@ -65,10 +65,11 @@ select {
   color: #333;
 }
 
-/* Estilo para inputs con error */
+/* ✅ Estilo para inputs con error (SOLO BORDE ROJO) */
 input.input-error,
 select.input-error {
   border-color: #dc3545;
+  background-color: #fff5f5;
 }
 
 select {
@@ -120,6 +121,47 @@ button:hover {
   color: #dc3545;
   font-size: 0.85rem;
   margin: 0.2rem 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* ===== MENSAJES DE ERROR MEJORADOS ===== */
+.error-message-container {
+  background: #fff5f5;
+  border: 2px solid #dc3545;
+  border-radius: 8px;
+  padding: 0.8rem;
+  margin-top: 0.5rem;
+  animation: slideDown 0.3s ease;
+}
+
+.error-message-title {
+  color: #dc3545;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.error-message-detail {
+  color: #721c24;
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .login-link {
@@ -161,11 +203,13 @@ button:hover {
   width: 100%;
 }
 
+/* ✅ BORDE VERDE Y FONDO CLARO CUANDO ES VÁLIDO */
 .input-valid {
   border-color: #28a745 !important;
   background-color: #f0fff4;
 }
 
+/* ✅ ICONOS DE VALIDACIÓN */
 .icon-check {
   position: absolute;
   right: 12px;
@@ -223,61 +267,30 @@ button:hover {
   color: #333;
 }
 
-/* ===== VALIDACIONES VISUALES ===== */
-.input-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.input-wrapper input,
-.input-wrapper select {
-  padding-right: 40px;
-  width: 100%;
-}
-
-.input-valid {
-  border-color: #28a745 !important;
-  background-color: #f0fff4;
-}
-
-.icon-check {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #28a745;
-  pointer-events: none;
-}
-
-.icon-check-select {
-  position: absolute;
-  right: 35px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #28a745;
-  pointer-events: none;
-}
-
-.icon-error {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #dc3545;
-  pointer-events: none;
-}
-
-.error-message {
-  color: #dc3545;
-  font-size: 0.85rem;
-  margin-top: 0.3rem;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
 /* ===== ESTILOS PARA SELECT CON BANDERAS ===== */
 select option {
   padding: 0.5rem;
   font-size: 1rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .registro-card {
+    padding: 2rem 1.5rem;
+    max-width: 100%;
+  }
+
+  .registro-title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .registro-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .registro-title {
+    font-size: 1.5rem;
+  }
 }

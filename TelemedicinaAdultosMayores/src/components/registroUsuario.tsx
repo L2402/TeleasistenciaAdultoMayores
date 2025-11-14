@@ -71,7 +71,7 @@ const RegistroUsuario = () => {
         return regex.test(email);
     };
 
-    // Validar NOMBRE DE USUARIO (estricto)
+    // VALIDACIÓN MEJORADA: Nombre de usuario
     const validarNombreUsuario = (usuario: string): boolean => {
         // Entre 4 y 15 caracteres
         if (usuario.length < 4 || usuario.length > 15) return false;
@@ -88,10 +88,43 @@ const RegistroUsuario = () => {
         return true;
     };
 
-    // Validar solo letras (nombres y apellidos)
+    // VALIDACIÓN MEJORADA: Nombre y apellido (COMPLETA Y CORREGIDA)
     const validarNombre = (texto: string): boolean => {
+        // 1. Validar longitud mínima
+        if (texto.length < 2) return false;
+
+        // 2. Solo letras, espacios, acentos y ñ (sin números ni símbolos)
         const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
-        return texto.length >= 3 && regex.test(texto);
+        if (!regex.test(texto)) return false;
+
+        // 3. No permitir espacios dobles
+        if (/\s{2,}/.test(texto)) return false;
+
+        // 4.No permitir letras repetidas más de 3 veces seguidas
+        // Permite: "aa" y "aaa", pero NO "aaaa"
+        if (/(.)\1{3,}/.test(texto)) return false;
+
+        // 5. No permitir espacios al inicio o final
+        if (texto.trim() !== texto) return false;
+
+        // 6.Permitir palabras repetidas (nombres como "Carlos Carlos")
+        // Comentado para permitir nombres dobles
+        // const palabras = texto.toLowerCase().split(' ').filter(p => p.length > 0);
+        // if (new Set(palabras).size !== palabras.length) return false;
+
+        // 7. No permitir nombres/apellidos de prueba comunes
+        const nombresPrueba = [
+            'test', 'prueba', 'demo', 'ejemplo', 'asdf', 'qwerty', 
+            'admin', 'user', 'usuario', 'nombre', 'apellido',
+            'aaaa', 'bbbb', 'cccc', 'dddd', 'eeee', 'ffff',
+            'xxx', 'yyy', 'zzz'
+        ];
+        if (nombresPrueba.some(p => texto.toLowerCase().includes(p))) return false;
+
+        // 8. Debe tener al menos una letra (no solo espacios)
+        if (!/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(texto)) return false;
+
+        return true;
     };
 
     // Validar contraseña: 8 caracteres, 1 mayúscula, 1 minúscula, 1 número
@@ -172,7 +205,7 @@ const RegistroUsuario = () => {
         }
 
         console.log('Datos del registro: ', formData);
-        alert(`✅ Usuario registrado exitosamente: @${formData.nombreUsuario}`);
+        alert(` Usuario registrado exitosamente: @${formData.nombreUsuario}`);
         
         setFormData({
             nombreUsuario: '',
@@ -246,7 +279,15 @@ const RegistroUsuario = () => {
                             {validaciones.nombre === true && <Check className="icon-check" size={20} />}
                             {validaciones.nombre === false && <X className="icon-error" size={20} />}
                         </div>
-                        {errors.nombre && <p className="error-message">⚠ El nombre debe contener solo letras (mínimo 3)</p>}
+                        {errors.nombre && (
+                            <div className="error-message-container">
+                                <p className="error-message-title">⚠ Nombre inválido</p>
+                                <p className="error-message-detail">
+                                    Por favor, ingresa un nombre válido. Solo se permiten letras y espacios, 
+                                    sin números ni símbolos. No uses palabras de prueba.
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     {/* APELLIDO */}
@@ -264,7 +305,15 @@ const RegistroUsuario = () => {
                             {validaciones.apellido === true && <Check className="icon-check" size={20} />}
                             {validaciones.apellido === false && <X className="icon-error" size={20} />}
                         </div>
-                        {errors.apellido && <p className="error-message">⚠ El apellido debe contener solo letras (mínimo 3)</p>}
+                        {errors.apellido && (
+                            <div className="error-message-container">
+                                <p className="error-message-title">⚠ Apellido inválido</p>
+                                <p className="error-message-detail">
+                                    Por favor, ingresa un apellido válido. Solo se permiten letras y espacios, 
+                                    sin números, símbolos ni palabras repetidas.
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     {/* PAÍS CON BANDERAS */}

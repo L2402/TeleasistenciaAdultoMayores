@@ -11,7 +11,7 @@ const Login = () => {
     const [mostrarPassword, setMostrarPassword] = useState(false);
     const [recordarme, setRecordarme] = useState(false);
     
-    // YA NO MOSTRAMOS VALIDACIÓN VERDE EN LOGIN
+    //  ELIMINADO: validaciones visuales de color verde
     const [intentosFallidos, setIntentosFallidos] = useState(0);
     const [bloqueado, setBloqueado] = useState(false);
     const [tiempoRestante, setTiempoRestante] = useState(0);
@@ -207,7 +207,7 @@ const Login = () => {
                         </div>
                     </div>
 
-                    {/* MENSAJE DE ERROR MEJORADO */}
+                    {/* MENSAJE DE ERROR MEJORADO  */}
                     {mostrarMensajeError && !bloqueado && (
                         <div className="mensaje-error-login">
                             <AlertTriangle size={20} />
@@ -218,7 +218,7 @@ const Login = () => {
                         </div>
                     )}
 
-                    {/* MENSAJE DE BLOQUEO MEJORADO */}
+                    {/* MENSAJE DE BLOQUEO MEJORADO  */}
                     {bloqueado && (
                         <div className="mensaje-bloqueo-login">
                             <AlertTriangle size={22} />
