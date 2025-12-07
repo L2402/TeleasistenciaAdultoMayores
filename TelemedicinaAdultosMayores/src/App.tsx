@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Login from "./components/login";
 import RegistroUsuario from "./components/registroUsuario";
 import Sidebar from "./components/sidebar";
+import Header from "./components/Header";
 import Footer from "./components/Footer";
 
 // Páginas de recuperación
@@ -34,12 +35,24 @@ import Contacto from "./pages/legal/Contacto";
 const App: React.FC = () => {
   const rol = localStorage.getItem("rol") || "adultoMayor";
 
-  // Layout base con sidebar y footer
+  // Layout base con header, sidebar y footer
   const Layout = () => (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <div style={{ display: "flex", flex: 1 }}>
+      {/* Header superior fijo */}
+      <Header />
+      
+      <div style={{ display: "flex", flex: 1, paddingTop: "70px" }}>
+        {/* Sidebar lateral */}
         <Sidebar rol={rol as "adultoMayor" | "medico" | "cuidador"} />
-        <div style={{ flex: 1, padding: "1rem", display: "flex", flexDirection: "column" }}>
+        
+        {/* Contenido principal */}
+        <div style={{ 
+          flex: 1, 
+          marginLeft: "80px",
+          padding: "1rem", 
+          display: "flex", 
+          flexDirection: "column" 
+        }}>
           <div style={{ flex: 1 }}>
             <Routes>
               {rol === "adultoMayor" && (
@@ -89,7 +102,7 @@ const App: React.FC = () => {
       <Route path="/recuperar-usuario" element={<RecuperarUsuario />} />
       <Route path="/recuperar-password" element={<RecuperarPassword />} />
 
-      {/* Rutas privadas con sidebar y footer */}
+      {/* Rutas privadas con header, sidebar y footer */}
       <Route path="/*" element={<Layout />} />
     </Routes>
   );

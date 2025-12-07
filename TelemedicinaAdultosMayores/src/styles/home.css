@@ -1,28 +1,19 @@
-/* Contenedor principal */
+/* Contenedor principal - AJUSTADO PARA HEADER */
 .home-container {
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100vh - 70px);
   padding: 2rem;
-  padding-top: 1.5rem; /* ✅ Reducir padding superior */
 }
 
-/* Logo - posición relativa para que no tape el contenido */
+/* ELIMINAR COMPLETAMENTE EL LOGO DEL CENTRO */
 .logo-header {
-  text-align: center;
-  margin-bottom: 2rem;
-  padding-top: 1rem;
+  display: none !important;
+  visibility: hidden !important;
 }
 
 .logo-sistema {
-  width: 280px;
-  height: auto;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
-  transition: transform 0.3s;
-  cursor: pointer;
-}
-
-.logo-sistema:hover {
-  transform: scale(1.05);
+  display: none !important;
+  visibility: hidden !important;
 }
 
 /* Contenido principal */
@@ -98,10 +89,6 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .logo-sistema {
-    width: 240px;
-  }
-
   .home-title {
     font-size: 2.2rem;
   }
@@ -110,10 +97,6 @@
 @media (max-width: 768px) {
   .home-container {
     padding: 1.5rem 1rem;
-  }
-
-  .logo-sistema {
-    width: 200px;
   }
 
   .home-title {
@@ -131,14 +114,6 @@
 }
 
 @media (max-width: 480px) {
-  .logo-sistema {
-    width: 180px;
-  }
-
-  .logo-header {
-    margin-bottom: 1.5rem;
-  }
-
   .home-title {
     font-size: 1.7rem;
   }
