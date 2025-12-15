@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeClosed, AlertTriangle } from "lucide-react";
 import "../styles/login.css"
+import { login } from "../services/auth";
 
 const Login = () => {
     const [nombre, setNombre] = useState("");
@@ -10,6 +11,7 @@ const Login = () => {
     const [errorPassword, setErrorPassword] = useState(false);
     const [mostrarPassword, setMostrarPassword] = useState(false);
     const [recordarme, setRecordarme] = useState(false);
+    const [cargando, setCargando] = useState(false);
     
     //  ELIMINADO: validaciones visuales de color verde
     const [intentosFallidos, setIntentosFallidos] = useState(0);
@@ -92,7 +94,7 @@ const Login = () => {
         setMostrarMensajeError(false);
     };
     
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (bloqueado) {
@@ -102,6 +104,7 @@ const Login = () => {
         setErrorNombre(false);
         setErrorPassword(false);
         setMostrarMensajeError(false);
+        setCargando(true);
         
         let hayError = false;
         
@@ -115,47 +118,57 @@ const Login = () => {
             hayError = true;
         }
         
-        if (hayError) return;
+        if (hayError) {
+            setCargando(false);
+            return;
+        }
 
-        // Credenciales correctas de ejemplo
-        const usuarioCorrecto = "admin";
-        const passwordCorrecto = "Admin123";
+        try {
+            // Usar el servicio de autenticación
+            const resultado = await login(nombre, password);
 
-        if (nombre === usuarioCorrecto && password === passwordCorrecto) {
-            // LOGIN EXITOSO
-            console.log("Login exitoso:", { nombre, password });
-            
-            if (recordarme) {
-                localStorage.setItem('usuarioRecordado', nombre);
+            if (resultado.success && resultado.user) {
+                // LOGIN EXITOSO
+                console.log("Login exitoso:", resultado.user);
+                
+                if (recordarme) {
+                    localStorage.setItem('usuarioRecordado', nombre);
+                } else {
+                    localStorage.removeItem('usuarioRecordado');
+                }
+
+                setIntentosFallidos(0);
+                localStorage.removeItem('intentosFallidos');
+                localStorage.removeItem('bloqueoHasta');
+
+                // El token y rol ya se guardaron en el servicio auth
+                navigate("/home");
             } else {
-                localStorage.removeItem('usuarioRecordado');
+                // LOGIN FALLIDO
+                const nuevosIntentos = intentosFallidos + 1;
+                setIntentosFallidos(nuevosIntentos);
+                localStorage.setItem('intentosFallidos', nuevosIntentos.toString());
+
+                // Marcar campos como error (borde rojo)
+                setErrorNombre(true);
+                setErrorPassword(true);
+                setMostrarMensajeError(true);
+
+                if (nuevosIntentos >= 3) {
+                    // Bloquear por 35 segundos
+                    const tiempoBloqueo = Date.now() + 35000;
+                    localStorage.setItem('bloqueoHasta', tiempoBloqueo.toString());
+                    setBloqueado(true);
+                    setTiempoRestante(35);
+                }
             }
-
-            setIntentosFallidos(0);
-            localStorage.removeItem('intentosFallidos');
-            localStorage.removeItem('bloqueoHasta');
-
-            localStorage.setItem('token', 'fake-token-123');
-            localStorage.setItem('rol', 'adultoMayor');
-            navigate("/home");
-        } else {
-            // LOGIN FALLIDO
-            const nuevosIntentos = intentosFallidos + 1;
-            setIntentosFallidos(nuevosIntentos);
-            localStorage.setItem('intentosFallidos', nuevosIntentos.toString());
-
-            // Marcar campos como error (borde rojo)
+        } catch (error) {
+            console.error('Error inesperado en login:', error);
             setErrorNombre(true);
             setErrorPassword(true);
             setMostrarMensajeError(true);
-
-            if (nuevosIntentos >= 3) {
-                // Bloquear por 35 segundos
-                const tiempoBloqueo = Date.now() + 35000;
-                localStorage.setItem('bloqueoHasta', tiempoBloqueo.toString());
-                setBloqueado(true);
-                setTiempoRestante(35);
-            }
+        } finally {
+            setCargando(false);
         }
     };
     
@@ -243,8 +256,8 @@ const Login = () => {
                         </label>
                     </div>
                     
-                    <button type="submit" disabled={bloqueado}>
-                        {bloqueado ? `Bloqueado (${tiempoRestante}s)` : "Iniciar Sesión"}
+                    <button type="submit" disabled={bloqueado || cargando}>
+                        {bloqueado ? `Bloqueado (${tiempoRestante}s)` : cargando ? "Iniciando sesión..." : "Iniciar Sesión"}
                     </button>
                 </form>
 

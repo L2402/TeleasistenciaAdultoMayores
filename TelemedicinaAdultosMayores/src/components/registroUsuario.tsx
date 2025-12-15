@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../styles/registroUsuario.css";
-import { Eye, EyeClosed, Check, X } from 'lucide-react';
+import { Eye, EyeClosed, Check, X, AlertTriangle } from 'lucide-react';
+import { registrar } from '../services/auth';
 
 const RegistroUsuario = () => {
     const [mostrarPassword, setMostrarPassword] = useState(false);
+    const [cargando, setCargando] = useState(false);
+    const [errorRegistro, setErrorRegistro] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -184,7 +187,7 @@ const RegistroUsuario = () => {
         });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const newErrors = {
@@ -199,52 +202,88 @@ const RegistroUsuario = () => {
         };
 
         setErrors(newErrors);
+        setErrorRegistro(null);
 
         if (Object.values(newErrors).some(error => error)) {
             return;
         }
 
-        console.log('Datos del registro: ', formData);
-        alert(` Usuario registrado exitosamente: @${formData.nombreUsuario}`);
-        
-        setFormData({
-            nombreUsuario: '',
-            nombre: '',
-            apellido: '',
-            contraseña: '',
-            correo: '',
-            pais: '',
-            fechaNacimiento: '',
-            tipoUsuario: ''
-        });
-        setErrors({
-            nombreUsuario: false,
-            nombre: false,
-            apellido: false,
-            contraseña: false,
-            correo: false,
-            pais: false,
-            fechaNacimiento: false,
-            tipoUsuario: false
-        });
-        setValidaciones({
-            nombreUsuario: null,
-            nombre: null,
-            apellido: null,
-            contraseña: null,
-            correo: null,
-            pais: null,
-            fechaNacimiento: null,
-            tipoUsuario: null
-        });
+        setCargando(true);
 
-        setTimeout(() => navigate("/"), 1500);
+        try {
+            // Usar el servicio de autenticación
+            const resultado = await registrar({
+                nombreUsuario: formData.nombreUsuario,
+                nombre: formData.nombre,
+                apellido: formData.apellido,
+                correo: formData.correo,
+                contraseña: formData.contraseña,
+                pais: formData.pais,
+                fechaNacimiento: formData.fechaNacimiento,
+                tipoUsuario: formData.tipoUsuario as 'adultoMayor' | 'cuidador' | 'medico'
+            });
+
+            if (resultado.success) {
+                console.log('Usuario registrado exitosamente:', resultado.user);
+                alert(`Usuario registrado exitosamente: @${formData.nombreUsuario}`);
+                
+                // Limpiar formulario
+                setFormData({
+                    nombreUsuario: '',
+                    nombre: '',
+                    apellido: '',
+                    contraseña: '',
+                    correo: '',
+                    pais: '',
+                    fechaNacimiento: '',
+                    tipoUsuario: ''
+                });
+                setErrors({
+                    nombreUsuario: false,
+                    nombre: false,
+                    apellido: false,
+                    contraseña: false,
+                    correo: false,
+                    pais: false,
+                    fechaNacimiento: false,
+                    tipoUsuario: false
+                });
+                setValidaciones({
+                    nombreUsuario: null,
+                    nombre: null,
+                    apellido: null,
+                    contraseña: null,
+                    correo: null,
+                    pais: null,
+                    fechaNacimiento: null,
+                    tipoUsuario: null
+                });
+
+                setTimeout(() => navigate("/"), 1500);
+            } else {
+                setErrorRegistro(resultado.error || 'Error al registrar usuario. Intente nuevamente.');
+            }
+        } catch (error: any) {
+            console.error('Error inesperado en registro:', error);
+            setErrorRegistro(error.message || 'Error inesperado al registrar usuario. Intente nuevamente.');
+        } finally {
+            setCargando(false);
+        }
     };
 
     return (
         <div className="registro-container">
             <h2 className="registro-title">Registro de Usuario</h2>
             <div className="registro-card">
+                {errorRegistro && (
+                    <div className="mensaje-error-login" style={{ marginBottom: '1rem' }}>
+                        <AlertTriangle size={20} />
+                        <div>
+                            <p className="error-titulo">Error en el registro</p>
+                            <p className="error-subtitulo">{errorRegistro}</p>
+                        </div>
+                    </div>
+                )}
                 <form onSubmit={handleSubmit}>
                     {/* NOMBRE DE USUARIO */}
                     <div className='form-group'>
@@ -416,7 +455,9 @@ const RegistroUsuario = () => {
                         {errors.tipoUsuario && <p className="error-message">⚠ Debe seleccionar un tipo de usuario</p>}
                     </div>
 
-                    <button type="submit">Registrar</button>
+                    <button type="submit" disabled={cargando}>
+                        {cargando ? "Registrando..." : "Registrar"}
+                    </button>
                 </form>
 
                 <div className='login-link'>

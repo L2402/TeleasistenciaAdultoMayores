@@ -3,6 +3,7 @@ npm install react react-dom
 npm install lucide-react
 npm install -D vite @vitejs/plugin-react
 npm install -D typescript @types/react @types/react-dom
+npm install @supabase/supabase-js
 
 --nueva libreria a instalar
 npm install lucide-react
