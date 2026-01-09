@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/header.css';
 
@@ -16,6 +16,9 @@ const Header = () => {
   const [screenReader, setScreenReader] = useState(false);
   const [fontSize, setFontSize] = useState(100);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Array<{label:string,path:string}>>([]);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const [shortcutToast, setShortcutToast] = useState('');
 
   // Textos en diferentes idiomas
   const textos = {
@@ -189,11 +192,72 @@ const Header = () => {
     }
   };
 
+  const userRol = localStorage.getItem('rol');
+
+  const SEARCH_INDEX = [
+    ...menuItems.map(m => ({ label: m.label, path: m.path })),
+    ...(userRol === 'medico' ? [{ label: t.medicamentos, path: '/medicamentos' }] : []),
+    { label: 'Incidencias', path: '/incidencias' },
+    { label: 'Perfil', path: '/perfil' },
+    { label: 'Citas', path: '/citas' }
+  ];
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.ctrlKey && !e.shiftKey && !e.altKey) {
+        const key = e.key.toLowerCase();
+        if (key === 'm') {
+          e.preventDefault();
+          window.dispatchEvent(new CustomEvent('toggle-sidebar'));
+          setShortcutToast('Menú (Ctrl+M)');
+          setTimeout(() => setShortcutToast(''), 1500);
+        }
+        if (key === 'b') {
+          e.preventDefault();
+          setSearchOpen(true);
+          setTimeout(() => searchInputRef.current?.focus(), 50);
+          setShortcutToast('Buscar (Ctrl+B)');
+          setTimeout(() => setShortcutToast(''), 1500);
+        }
+        if (key === 'c') {
+          e.preventDefault();
+          navigate('/perfil');
+          setShortcutToast('Configuración (Ctrl+C)');
+          setTimeout(() => setShortcutToast(''), 1500);
+        }
+        if (key === 'x') {
+          e.preventDefault();
+          navigate(-1);
+          setShortcutToast('Retroceder (Ctrl+X)');
+          setTimeout(() => setShortcutToast(''), 1500);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [navigate]);
+
+  useEffect(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return setSearchResults([]);
+    const matches = SEARCH_INDEX.filter(s => s.label.toLowerCase().includes(q)).slice(0,6);
+    setSearchResults(matches);
+  }, [searchQuery]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       console.log('Buscando:', searchQuery);
-      setSearchOpen(false);
+      if (searchResults.length > 0) {
+        navigate(searchResults[0].path);
+        setSearchOpen(false);
+        setSearchQuery('');
+      } else {
+        // Si no hay coincidencias, mostrar mensaje corto
+        setShortcutToast('No se encontraron resultados');
+        setTimeout(() => setShortcutToast(''), 1600);
+      }
     }
   };
 
@@ -209,6 +273,7 @@ const Header = () => {
   return (
     <header className="app-header">
       <div className="header-container">
+        {shortcutToast && <div className="shortcut-toast">{shortcutToast}</div>}
         {/* Logo y Título */}
         <div className="logo-section">
           <div className="logo-container">
@@ -263,6 +328,7 @@ const Header = () => {
                   <div className="search-input-wrapper">
                     <span className="search-icon">🔍</span>
                     <input
+                      ref={searchInputRef}
                       type="text"
                       placeholder={t.buscarPlaceholder}
                       className="search-input"
@@ -272,18 +338,30 @@ const Header = () => {
                     />
                   </div>
                 </form>
-                <div className="search-suggestions">
-                  <p className="suggestion-title">{t.busquedasSugeridas}</p>
-                  <button className="suggestion-item" onClick={() => navigate('/perfil')}>
-                    🏥 {t.misMedicos}
-                  </button>
-                  <button className="suggestion-item" onClick={() => navigate('/monitoreo')}>
-                    📊 {t.resultados}
-                  </button>
-                  <button className="suggestion-item" onClick={() => navigate('/perfil')}>
-                    💊 {t.medicamentos}
-                  </button>
-                </div>
+
+                {/* Resultados dinámicos */}
+                {searchResults.length > 0 ? (
+                  <div className="search-results">
+                    {searchResults.map((r, i) => (
+                      <button key={i} className="result-item" onClick={() => { navigate(r.path); setSearchOpen(false); setSearchQuery(''); }}>
+                        {r.label}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="search-suggestions">
+                    <p className="suggestion-title">{t.busquedasSugeridas}</p>
+                    <button className="suggestion-item" onClick={() => navigate('/perfil')}>
+                      🏥 {t.misMedicos}
+                    </button>
+                    <button className="suggestion-item" onClick={() => navigate('/monitoreo')}>
+                      📊 {t.resultados}
+                    </button>
+                    <button className="suggestion-item" onClick={() => navigate('/perfil')}>
+                      💊 {t.medicamentos}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -454,6 +532,16 @@ const Header = () => {
                       <span className="toggle-slider"></span>
                     </label>
                   </button>
+
+                  <div className="shortcuts-list" style={{ padding: '0.5rem 1rem' }}>
+                    <p style={{ margin: 0, fontWeight: 700 }}>Atajos de teclado</p>
+                    <ul style={{ margin: '0.4rem 0 0 1rem', padding: 0 }}>
+                      <li>Ctrl + M — Menú</li>
+                      <li>Ctrl + B — Buscar</li>
+                      <li>Ctrl + C — Configuración</li>
+                      <li>Ctrl + X — Retroceder</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             )}

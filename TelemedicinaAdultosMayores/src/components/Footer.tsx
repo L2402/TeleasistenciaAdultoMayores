@@ -1,36 +1,38 @@
 import { useNavigate } from "react-router-dom";
 import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import "../styles/footer.css";
+import { useLang } from '../contexts/LanguageContext';
 
 const Footer = () => {
   const navigate = useNavigate();
   const añoActual = new Date().getFullYear();
+  const { t } = useLang();
 
   return (
     <footer className="footer">
-      <div className="footer-content">
+      <div className="footer-inner">
         {/* Columna 1: Productos/Servicios */}
         <div className="footer-section">
-          <h4 className="footer-subtitle">Productos</h4>
+          <h4 className="footer-subtitle">{t.productos}</h4>
           <ul className="footer-links">
             <li>
               <button onClick={() => navigate("/citas")} className="footer-link">
-                Consultas Médicas
+                {"Consultas Médicas"}
               </button>
             </li>
             <li>
               <button onClick={() => navigate("/monitoreo")} className="footer-link">
-                Monitoreo de Salud
+                {"Monitoreo de Salud"}
               </button>
             </li>
             <li>
               <button onClick={() => navigate("/mensajes")} className="footer-link">
-                Videollamadas
+                {"Videollamadas"}
               </button>
             </li>
             <li>
               <button onClick={() => navigate("/home")} className="footer-link">
-                Asistencia 24/7
+                {"Asistencia 24/7"}
               </button>
             </li>
           </ul>
@@ -38,26 +40,26 @@ const Footer = () => {
 
         {/* Columna 2: Compañía */}
         <div className="footer-section">
-          <h4 className="footer-subtitle">Compañía</h4>
+          <h4 className="footer-subtitle">{t.compania}</h4>
           <ul className="footer-links">
             <li>
               <button onClick={() => navigate("/contacto")} className="footer-link">
-                Contacto
+                {t.contacto}
               </button>
             </li>
             <li>
               <button onClick={() => navigate("/preguntas-frecuentes")} className="footer-link">
-                Preguntas Frecuentes
+                {"Preguntas Frecuentes"}
               </button>
             </li>
             <li>
               <button onClick={() => navigate("/home")} className="footer-link">
-                Nuestro Equipo
+                {"Nuestro Equipo"}
               </button>
             </li>
             <li>
               <button onClick={() => navigate("/home")} className="footer-link">
-                Centro de Asistencia
+                {"Centro de Asistencia"}
               </button>
             </li>
           </ul>
@@ -65,7 +67,7 @@ const Footer = () => {
 
         {/* Columna 3: Contacto */}
         <div className="footer-section">
-          <h4 className="footer-subtitle">Contacto</h4>
+          <h4 className="footer-subtitle">{t.contacto}</h4>
           <ul className="footer-contact">
             <li className="contact-item">
               <span className="contact-label">Estados Unidos:</span>
@@ -108,7 +110,7 @@ const Footer = () => {
             onClick={() => navigate("/politica-privacidad")} 
             className="footer-privacy-link"
           >
-            Política de privacidad
+            {t.politicaPrivacidad}
           </button>
         </div>
         

@@ -1,15 +1,19 @@
-/* ========== HEADER PRINCIPAL - COLOR VERDE CLARO ========== */
+/* ========== HEADER PRINCIPAL (ajustado a referencia: muy claro) ========== */
 .app-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 70px;
-  background: linear-gradient(135deg, #7dd3c0 0%, #5fb9a8 100%);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  background: #ffffffcc; /* blanco translúcido */
+  box-shadow: 0 6px 18px rgba(14,30,30,0.06);
   z-index: 1000;
-  border-bottom: 3px solid #4a9d8b;
+  border-bottom: 1px solid rgba(10,74,111,0.06);
 }
+
+.app-header .brand-name { color: var(--primary); text-shadow: none; }
+.app-header .brand-tagline { color: rgba(15,118,110,0.7); }
+
 
 .header-container {
   height: 100%;
@@ -29,11 +33,11 @@
 }
 
 .logo-container {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 12px;
   padding: 0.4rem 0.8rem;
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,9 +104,9 @@
 }
 
 .header-menu-button:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.18);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 18px rgba(10,74,111,0.12);
 }
 
 .menu-emoji {
@@ -155,7 +159,7 @@
   font-weight: 700;
   border-radius: 10px;
   padding: 0.15rem 0.4rem;
-  border: 2px solid #7dd3c0;
+  border: 2px solid rgba(18,166,154,0.16);
 }
 
 /* ========== PANELES DESPLEGABLES ========== */
@@ -221,7 +225,7 @@
 }
 
 .search-input:focus {
-  border-color: #7dd3c0;
+  border-color: var(--accent);
 }
 
 .search-suggestions {
@@ -255,6 +259,43 @@
   color: #2d8b73;
 }
 
+.search-results {
+  padding: 0.5rem 1rem 1rem 1rem;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.result-item {
+  padding: 0.6rem;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  border-radius: 6px;
+}
+
+.result-item:hover {
+  background: #f0f8f3;
+  color: #2d8b73;
+}
+
+/* Toast de atajos */
+.shortcut-toast {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: rgba(0,0,0,0.75);
+  color: white;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  z-index: 1100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
 /* ========== NOTIFICACIONES ========== */
 .panel-header {
   padding: 1rem;
@@ -274,7 +315,7 @@
 .mark-all-read {
   background: none;
   border: none;
-  color: #7dd3c0;
+  color: var(--accent);
   font-size: 0.8rem;
   cursor: pointer;
   font-weight: 600;
@@ -328,7 +369,7 @@
   background: #f8f9fa;
   border: none;
   border-top: 1px solid #e0e0e0;
-  color: #7dd3c0;
+  color: var(--accent);
   font-weight: 600;
   cursor: pointer;
   font-size: 0.9rem;
@@ -336,7 +377,7 @@
 }
 
 .view-all-btn:hover {
-  background: #d4f4e8;
+  background: rgba(18,166,154,0.06);
 }
 
 /* ========== IDIOMAS ========== */
@@ -380,7 +421,7 @@
 
 .check-icon {
   margin-left: auto;
-  color: #7dd3c0;
+  color: var(--accent);
   font-weight: 700;
   font-size: 1.2rem;
 }
@@ -474,7 +515,7 @@
 }
 
 .toggle-switch input:checked + .toggle-slider {
-  background-color: #7dd3c0;
+  background-color: var(--accent);
 }
 
 .toggle-switch input:checked + .toggle-slider::before {

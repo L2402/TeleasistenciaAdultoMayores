@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1600" height="1200" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Doctor illustration placeholder">
+  <defs>
+    <linearGradient id="g1" x1="0" x2="1">
+      <stop offset="0%" stop-color="#eaf7f6"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="24" flood-color="#0f766e" flood-opacity="0.08" />
+    </filter>
+  </defs>
+
+  <rect width="100%" height="100%" fill="url(#g1)" />
+
+  <!-- left soft vignette -->
+  <ellipse cx="300" cy="300" rx="420" ry="240" fill="#f3f6f6" opacity="0.9"/>
+
+  <!-- doctor figure (stylized) -->
+  <g transform="translate(640,240)" filter="url(#shadow)">
+    <!-- body card -->
+    <rect x="0" y="80" rx="18" ry="18" width="520" height="360" fill="#ffffff" />
+    <!-- stethoscope cord -->
+    <path d="M260 120 C270 160 240 200 240 220" stroke="#0f766e" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <circle cx="260" cy="110" r="48" fill="#dff6f4" />
+    <!-- head circle -->
+    <circle cx="260" cy="60" r="52" fill="#fff5f0" />
+    <rect x="200" y="58" width="120" height="20" rx="10" fill="#0f766e" opacity="0.05" />
+  </g>
+
+  <!-- tablet / phone devices -->
+  <g transform="translate(880,420)">
+    <rect x="0" y="0" rx="14" width="220" height="320" fill="#ffffff" stroke="#e8f9f6" stroke-width="2" />
+    <rect x="18" y="36" rx="8" width="184" height="100" fill="#e8faf9" />
+    <rect x="18" y="146" rx="8" width="184" height="90" fill="#eaf7f6" />
+    <rect x="18" y="250" rx="6" width="184" height="34" fill="#dff6f4" />
+  </g>
+
+  <!-- soft decorative wave -->
+  <path d="M0 920 C 260 780 560 760 900 820 C 1240 880 1520 760 1600 700 L1600 1200 L0 1200 Z" fill="#eaf7f6" opacity="0.9"/>
+
+  <!-- small icons decorative -->
+  <g transform="translate(420,220)" fill="#0f766e" opacity="0.9">
+    <rect x="-12" y="-12" width="44" height="44" rx="8" fill="#ffffff" stroke="#dff6f4" />
+    <path d="M0 6 L8 0 L16 6 L8 18 Z" fill="#0f766e" opacity="0.9" />
+  </g>
+
+  <g transform="translate(1100,180)" fill="#0f766e" opacity="0.7">
+    <circle cx="0" cy="0" r="26" fill="#ffffff" stroke="#dff6f4" />
+    <path d="M-6 0 h12" stroke="#0f766e" stroke-width="3" stroke-linecap="round" />
+  </g>
+
+  <title>Hero illustration placeholder: healthcare professional and devices</title>
+</svg>

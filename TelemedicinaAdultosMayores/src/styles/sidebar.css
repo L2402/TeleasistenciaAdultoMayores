@@ -4,7 +4,7 @@
   left: 0;
   height: 100vh;
   width: 80px;
-  background-color: #1a1f2b;
+  background: linear-gradient(180deg, var(--primary), #062931);
   color: white;
   transition: width 0.3s ease;
   overflow: hidden;
@@ -47,14 +47,14 @@
 }
 
 .sidebar li:hover {
-  background: #2e3a54;
+  background: rgba(18,166,154,0.06);
 }
 
 .sidebar svg {
   flex-shrink: 0;
   width: 22px;
   height: 22px;
-  color: #fff;
+  color: white;
 }
 
 .sidebar-text {

@@ -154,8 +154,11 @@ const Mensajes = () => {
 
   return (
     <div className="mensajes-container">
-      <div className="mensajes-header">
-        <h2>Mensajes</h2>
+      <div className="mensajes-header app-hero">
+        <div className="container">
+          <h2 className="h-large">Mensajes</h2>
+          <p className="lead">Comunícate con tu equipo médico de forma rápida y segura</p>
+        </div>
       </div>
 
       <div className="chat-layout">

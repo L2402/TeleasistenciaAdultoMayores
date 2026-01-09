@@ -63,8 +63,8 @@ const Perfil = () => {
 
   return (
     <div className="perfil-container">
-      <div className="perfil-header">
-        <div className="perfil-header-content">
+      <div className="perfil-header app-hero small">
+        <div className="perfil-header-content container">
           <div className="avatar-section">
             <div className="avatar-grande">👤</div>
             <button className="btn-cambiar-foto">📷 Cambiar foto</button>

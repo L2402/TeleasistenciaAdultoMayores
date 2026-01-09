@@ -1,5 +1,4 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/login";
 import RegistroUsuario from "./components/registroUsuario";
 import Sidebar from "./components/sidebar";
@@ -16,6 +15,8 @@ import Citas from "./pages/adultoMayor/Citas";
 import Monitoreo from "./pages/adultoMayor/Monitoreo";
 import Mensajes from "./pages/adultoMayor/Mensajes";
 import Perfil from "./pages/adultoMayor/Perfil";
+import RegistroMedicamentos from "./pages/medico/RegistroMedicamentos";
+import Incidencias from "./pages/adultoMayor/Incidencias";
 
 // páginas del médico
 import PanelMedico from "./pages/medico/PanelMedico";
@@ -32,7 +33,7 @@ import TerminosCondiciones from "./pages/legal/TerminosCondiciones";
 import PreguntasFrecuentes from "./pages/legal/PreguntasFrecuentes";
 import Contacto from "./pages/legal/Contacto";
 
-const App: React.FC = () => {
+const App = () => {
   const rol = localStorage.getItem("rol") || "adultoMayor";
 
   // Layout base con header, sidebar y footer
@@ -61,6 +62,7 @@ const App: React.FC = () => {
                   <Route path="/citas" element={<Citas />} />
                   <Route path="/monitoreo" element={<Monitoreo />} />
                   <Route path="/mensajes" element={<Mensajes />} />
+                  <Route path="/incidencias" element={<Incidencias />} />
                   <Route path="/perfil" element={<Perfil />} />
                 </>
               )}
@@ -70,6 +72,7 @@ const App: React.FC = () => {
                   <Route path="/home" element={<PanelMedico />} />
                   <Route path="/usuarios" element={<Pacientes />} />
                   <Route path="/reportes" element={<Reportes />} />
+                  <Route path="/medicamentos" element={<RegistroMedicamentos />} />
                 </>
               )}
 
@@ -85,12 +88,18 @@ const App: React.FC = () => {
               <Route path="/terminos-condiciones" element={<TerminosCondiciones />} />
               <Route path="/preguntas-frecuentes" element={<PreguntasFrecuentes />} />
               <Route path="/contacto" element={<Contacto />} />
+
+              {/* Redirección segura: si un usuario no es médico y accede a /medicamentos, lo llevamos a /home */}
+              {rol !== 'medico' && (
+                <Route path="/medicamentos" element={<Navigate to="/home" replace />} />
+              )}
             </Routes>
           </div>
-          {/* Footer agregado */}
-          <Footer />
         </div>
       </div>
+
+      {/* Footer a ancho completo */}
+      <Footer />
     </div>
   );
 
@@ -98,6 +107,7 @@ const App: React.FC = () => {
     <Routes>
       {/*  Rutas públicas */}
       <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<RegistroUsuario />} />
       <Route path="/recuperar-usuario" element={<RecuperarUsuario />} />
       <Route path="/recuperar-password" element={<RecuperarPassword />} />

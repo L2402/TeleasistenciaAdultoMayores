@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Home, Calendar, HeartPulse, Users, MessageSquare, LogOut, UserCog, Stethoscope } from "lucide-react";
+import { Home, Calendar, HeartPulse, Users, MessageSquare, LogOut, UserCog, Stethoscope, Pill, AlertCircle } from "lucide-react";
 import "../styles/sidebar.css";
 import React from "react";
 
@@ -11,12 +11,19 @@ const Sidebar = ({ rol }: SidebarProps) => {
   const navigate = useNavigate();
   const [isExpanded, setItsExpanded] = React.useState(false);
 
+  React.useEffect(() => {
+    const handler = () => setItsExpanded((prev: boolean) => !prev);
+    window.addEventListener('toggle-sidebar', handler as EventListener);
+    return () => window.removeEventListener('toggle-sidebar', handler as EventListener);
+  }, []);
+
   const menus = {
     adultoMayor: [
       { icon: <Home size={20} />, text: "Inicio", path: "/home" },
       { icon: <Calendar size={20} />, text: "Mis citas", path: "/citas" },
       { icon: <HeartPulse size={20} />, text: "Monitoreo", path: "/monitoreo" },
       { icon: <MessageSquare size={20} />, text: "Mensajes", path: "/mensajes" },
+      { icon: <AlertCircle size={20} />, text: "Incidencias", path: "/incidencias" },
       { icon: <UserCog size={20} />, text: "Perfil", path: "/perfil" },
     ],
     medico: [
@@ -24,6 +31,7 @@ const Sidebar = ({ rol }: SidebarProps) => {
       { icon: <Users size={20} />, text: "Pacientes", path: "/usuarios" },
       { icon: <Calendar size={20} />, text: "Citas", path: "/citas" },
       { icon: <HeartPulse size={20} />, text: "Reportes", path: "/reportes" },
+      { icon: <Pill size={20} />, text: "Medicamentos", path: "/medicamentos" },
       { icon: <MessageSquare size={20} />, text: "Mensajes", path: "/mensajes" },
       { icon: <UserCog size={20} />, text: "Perfil", path: "/perfil" },
     ],
