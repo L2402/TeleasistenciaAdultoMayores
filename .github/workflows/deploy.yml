@@ -1,0 +1,68 @@
+# Nombre del workflow (aparece en la pestaña de Actions en GitHub)
+name: Deploy to Vercel
+
+# Gatillos del workflow - cuándo se ejecuta
+on:
+  # Se ejecuta cada vez que haces push a la rama main
+  push:
+    branches:
+      - main
+  # También se ejecuta cuando haces pull request a main (opcional)
+  pull_request:
+    branches:
+      - main
+
+# Configuración del entorno y variables globales
+env:
+  NODE_VERSION: '18'
+
+# Los trabajos que se ejecutarán
+jobs:
+  # Nombre del trabajo
+  build-and-deploy:
+    # Máquina virtual donde se ejecutará (ubuntu-latest es la más común)
+    runs-on: ubuntu-latest
+    
+    # Pasos del workflow
+    steps:
+      # 1. Descargar el código del repositorio
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # 2. Configurar Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          # Cache de npm para acelerar instancias
+          cache: 'npm'
+      
+      # 3. Instalar dependencias
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./TelemedicinaAdultosMayores
+      
+      # 4. Ejecutar linter (opcional, pero recomendado)
+      - name: Run ESLint
+        run: npm run lint --if-present
+        working-directory: ./TelemedicinaAdultosMayores
+      
+      # 5. Compilar el proyecto
+      - name: Build application
+        run: npm run build
+        working-directory: ./TelemedicinaAdultosMayores
+      
+      # 6. Deploy a Vercel
+      - name: Deploy to Vercel
+        uses: vercel/action@v6
+        with:
+          # Token de Vercel (se configura en secrets de GitHub)
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          # ID del proyecto en Vercel (se configura en secrets)
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          # ID específico del proyecto
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          # Producción = true si es main, false para otros casos
+          production: ${{ github.ref == 'refs/heads/main' }}
+          # Directorio raíz del proyecto
+          working-directory: ./TelemedicinaAdultosMayores
