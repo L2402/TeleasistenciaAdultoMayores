@@ -58,7 +58,8 @@ jobs:
       
       # 7. Deploy a Vercel (usando CLI)
       - name: Deploy to Vercel
-        run: vercel deploy --prod --cwd ./TelemedicinaAdultosMayores --token=${{ secrets.VERCEL_TOKEN }} --yes
+        working-directory: ./TelemedicinaAdultosMayores
+        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
