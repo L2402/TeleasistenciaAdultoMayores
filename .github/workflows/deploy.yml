@@ -52,17 +52,14 @@ jobs:
         run: npm run build
         working-directory: ./TelemedicinaAdultosMayores
       
-      # 6. Deploy a Vercel
+      # 6. Instalar Vercel CLI
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      
+      # 7. Deploy a Vercel (usando CLI)
       - name: Deploy to Vercel
-        uses: vercel/action@v6
-        with:
-          # Token de Vercel (se configura en secrets de GitHub)
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          # ID del proyecto en Vercel (se configura en secrets)
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          # ID específico del proyecto
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          # Producción = true si es main, false para otros casos
-          production: ${{ github.ref == 'refs/heads/main' }}
-          # Directorio raíz del proyecto
-          working-directory: ./TelemedicinaAdultosMayores
+        working-directory: ./TelemedicinaAdultosMayores
+        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
