@@ -14,7 +14,7 @@ on:
 
 # Configuración del entorno y variables globales
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20.19'
 
 # Los trabajos que se ejecutarán
 jobs:
