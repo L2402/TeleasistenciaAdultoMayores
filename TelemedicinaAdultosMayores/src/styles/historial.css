@@ -1,0 +1,44 @@
+/* Estilos mínimos para Historial de Sesiones */
+.historial-table th,
+.historial-table td {
+  border: 1px solid #e5e7eb;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.historial-table thead th {
+  background: #f3f4f6;
+  color: #111827;
+  font-weight: 600;
+}
+
+.historial-table tbody tr:nth-child(even) {
+  background: #ffffff;
+}
+
+.historial-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.home-container input[type=date],
+.home-container select {
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+/* Mejor separación para los filtros */
+.home-container > div > div label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 600px) {
+  .home-container > div { 
+    flex-direction: column;
+    gap: 8px;
+  }
+}

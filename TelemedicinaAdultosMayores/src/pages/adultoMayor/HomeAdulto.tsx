@@ -1,9 +1,10 @@
 import "../../styles/home.css";
 import { CalendarDays, HeartPulse, MessageSquare, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const HomeAdulto = () => {
-  const usuario = "Carlos Pérez";
+  const [usuario, setUsuario] = useState<string>("");
   const proximaCita = {
     fecha: "25 de octubre, 10:00 AM",
     medico: "Dra. María Gómez",
@@ -11,6 +12,23 @@ const HomeAdulto = () => {
   const estadoSalud = "Estable";
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('usuario_perfil');
+      if (raw) {
+        const perfil = JSON.parse(raw) as any;
+        const nombre = perfil.nombre || perfil.nombre_completo || perfil.nombreUsuario || "";
+        const apellido = perfil.apellido || "";
+        const display = (nombre && apellido) ? `${nombre} ${apellido}` : (nombre || perfil.nombreUsuario || "Usuario");
+        setUsuario(display);
+      } else {
+        setUsuario('Usuario');
+      }
+    } catch (err) {
+      setUsuario('Usuario');
+    }
+  }, []);
 
   return (
     <div className="home-container">
@@ -49,6 +67,27 @@ const HomeAdulto = () => {
             <h3>Mensajes</h3>
             <p>Tienes 2 nuevos mensajes</p>
             <small>Revisa tus conversaciones</small>
+          </div>
+          
+          <div className="card" onClick={() => navigate("/historial-sesiones") }>
+            <CalendarDays size={32} color="#0ea5e9" />
+            <h3>Historial</h3>
+            <p>Sesiones de teleasistencia</p>
+            <small>Ver historial y filtros</small>
+          </div>
+
+          <div className="card" onClick={() => navigate("/registro-animo") }>
+            <HeartPulse size={32} color="#fb7185" />
+            <h3>Registro anímico</h3>
+            <p>Registrar cómo te sientes</p>
+            <small>Añade motivo y observaciones</small>
+          </div>
+
+          <div className="card" onClick={() => navigate("/kyc") }>
+            <User size={32} color="#f59e0b" />
+            <h3>Verificación (KYC)</h3>
+            <p>Confirmar identidad</p>
+            <small>Ingresa cédula y fecha de nacimiento</small>
           </div>
 
           <div className="card" onClick={() => navigate("/perfil")}>

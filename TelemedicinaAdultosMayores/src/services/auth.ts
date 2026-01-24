@@ -31,13 +31,21 @@ export const login = async (identificador: string, password: string): Promise<Lo
       const { data: usuarioData, error: usuarioError } = await supabase
         .from('usuarios')
         .select('correo')
-        .eq('nombre_usuario', identificador)
-        .single()
+        .ilike('nombre_usuario', identificador)
+        .limit(1)
+        .maybeSingle()
 
-      if (usuarioError || !usuarioData) {
+      if (usuarioError) {
         return {
           success: false,
-          error: 'Usuario o contraseña incorrectos'
+          error: 'Error al buscar usuario'
+        }
+      }
+
+      if (!usuarioData) {
+        return {
+          success: false,
+          error: 'Usuario no registrado'
         }
       }
 
@@ -51,6 +59,12 @@ export const login = async (identificador: string, password: string): Promise<Lo
     })
 
     if (error) {
+      if (error.message.includes('Invalid login credentials') || error.message.includes('Email not confirmed')) {
+        return {
+          success: false,
+          error: 'Contraseña incorrecta o usuario no confirmado'
+        }
+      }
       return {
         success: false,
         error: error.message || 'Error al iniciar sesión'
@@ -72,6 +86,23 @@ export const login = async (identificador: string, password: string): Promise<Lo
       .single()
 
     const rol = userData?.tipo_usuario || 'adultoMayor'
+
+    // Intentar obtener el perfil completo del usuario y guardarlo en localStorage
+    try {
+      const { data: perfilData } = await supabase
+        .from('usuarios')
+        .select('*')
+        .eq('id', data.user.id)
+        .maybeSingle()
+
+      if (perfilData) {
+        localStorage.setItem('usuario_perfil', JSON.stringify(perfilData));
+        window.dispatchEvent(new Event('userProfileChanged'));
+      }
+    } catch (err) {
+      // no bloquear login por fallo al obtener perfil
+      console.warn('No se pudo obtener perfil de usuario:', err);
+    }
 
     // Guardar información en localStorage
     if (data.session) {
@@ -99,6 +130,27 @@ export const login = async (identificador: string, password: string): Promise<Lo
  */
 export const registrar = async (datos: RegistroData): Promise<{ success: boolean; error?: string; user?: any }> => {
   try {
+    // Validar unicidad de nombre_usuario y correo
+    const { data: existingUser, error: checkError } = await supabase
+      .from('usuarios')
+      .select('id')
+      .or(`nombre_usuario.ilike.${datos.nombreUsuario},correo.ilike.${datos.correo}`)
+      .maybeSingle()
+
+    if (checkError) {
+      return {
+        success: false,
+        error: 'Error al verificar unicidad del usuario'
+      }
+    }
+
+    if (existingUser) {
+      return {
+        success: false,
+        error: 'El nombre de usuario o correo electrónico ya están registrados'
+      }
+    }
+
     // 1. Registrar usuario en Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: datos.correo,

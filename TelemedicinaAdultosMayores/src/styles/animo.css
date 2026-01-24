@@ -1,0 +1,23 @@
+/* Estilos mínimos para Registro de Estado Anímico */
+.home-container form label { display: block; font-size: 13px; margin-bottom: 6px; }
+.home-container input, .home-container select, .home-container textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #ffffff;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover { opacity: 0.95; }
+
+.historial-table th, .historial-table td { border: 1px solid #e5e7eb; padding: 8px 10px; }

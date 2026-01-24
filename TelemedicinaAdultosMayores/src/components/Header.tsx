@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Home, Calendar, Heart, MessageSquare, HelpCircle, Search, Bell, Globe, Settings, User, LogOut, Eye, Clock, Pill, Stethoscope, BarChart3, Minus, Plus, Type, Sun, Moon, Palette, Volume2, ChevronDown, Check } from 'lucide-react';
 import '../styles/header.css';
 
 const Header = () => {
@@ -19,6 +20,14 @@ const Header = () => {
   const [searchResults, setSearchResults] = useState<Array<{label:string,path:string}>>([]);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [shortcutToast, setShortcutToast] = useState('');
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  // Refs para los paneles
+  const searchPanelRef = useRef<HTMLDivElement | null>(null);
+  const notificationPanelRef = useRef<HTMLDivElement | null>(null);
+  const languagePanelRef = useRef<HTMLDivElement | null>(null);
+  const accessibilityPanelRef = useRef<HTMLDivElement | null>(null);
+  const profilePanelRef = useRef<HTMLDivElement | null>(null);
 
   // Textos en diferentes idiomas
   const textos = {
@@ -137,11 +146,11 @@ const Header = () => {
   ];
 
   const menuItems = [
-    { emoji: '🏠', label: t.inicio, path: '/home' },
-    { emoji: '📅', label: t.citas, path: '/citas' },
-    { emoji: '💓', label: t.salud, path: '/monitoreo' },
-    { emoji: '💬', label: t.mensajes, path: '/mensajes' },
-    { emoji: '❓', label: t.ayuda, path: '/preguntas-frecuentes' }
+    { icon: <Home size={24} />, label: t.inicio, path: '/home' },
+    { icon: <Calendar size={24} />, label: t.citas, path: '/citas' },
+    { icon: <Heart size={24} />, label: t.salud, path: '/monitoreo' },
+    { icon: <MessageSquare size={24} />, label: t.mensajes, path: '/mensajes' },
+    { icon: <HelpCircle size={24} />, label: t.ayuda, path: '/preguntas-frecuentes' }
   ];
 
   const idiomas = [
@@ -245,6 +254,66 @@ const Header = () => {
     setSearchResults(matches);
   }, [searchQuery]);
 
+  useEffect(() => {
+    const perfilRaw = localStorage.getItem('usuario_perfil');
+    if (perfilRaw) {
+      try {
+        const perfil = JSON.parse(perfilRaw);
+        setUserProfile(perfil);
+      } catch (error) {
+        console.error('Error parsing user profile:', error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleProfileChange = () => {
+      const perfilRaw = localStorage.getItem('usuario_perfil');
+      if (perfilRaw) {
+        try {
+          const perfil = JSON.parse(perfilRaw);
+          setUserProfile(perfil);
+        } catch (error) {
+          console.error('Error parsing user profile:', error);
+          setUserProfile(null);
+        }
+      } else {
+        setUserProfile(null);
+      }
+    };
+
+    window.addEventListener('userProfileChanged', handleProfileChange);
+    return () => {
+      window.removeEventListener('userProfileChanged', handleProfileChange);
+    };
+  }, []);
+
+  // Cerrar paneles al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchPanelRef.current && !searchPanelRef.current.contains(event.target as Node)) {
+        setSearchOpen(false);
+      }
+      if (notificationPanelRef.current && !notificationPanelRef.current.contains(event.target as Node)) {
+        setNotificationOpen(false);
+      }
+      if (languagePanelRef.current && !languagePanelRef.current.contains(event.target as Node)) {
+        setLanguageOpen(false);
+      }
+      if (accessibilityPanelRef.current && !accessibilityPanelRef.current.contains(event.target as Node)) {
+        setAccessibilityOpen(false);
+      }
+      if (profilePanelRef.current && !profilePanelRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -266,6 +335,9 @@ const Header = () => {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('rol');
+      localStorage.removeItem('usuario_perfil');
+      setUserProfile(null);
+      window.dispatchEvent(new Event('userProfileChanged'));
       navigate("/");
     }
   };
@@ -281,9 +353,10 @@ const Header = () => {
               src="/logo-telemedicina.png" 
               alt="Teleasistencia"
               className="logo-image"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-                const parent = (e.target as HTMLElement).parentElement;
+              onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                const target = e.currentTarget;
+                target.style.display = 'none';
+                const parent = target.parentElement;
                 if (parent) {
                   parent.innerHTML = '<span class="logo-emoji">👨‍⚕️👵</span>';
                 }
@@ -304,7 +377,7 @@ const Header = () => {
               className="header-menu-button"
               onClick={() => navigate(item.path)}
             >
-              <span className="menu-emoji">{item.emoji}</span>
+              <span className="menu-icon">{item.icon}</span>
               <span className="menu-label">{item.label}</span>
             </button>
           ))}
@@ -319,11 +392,11 @@ const Header = () => {
               onClick={() => setSearchOpen(!searchOpen)}
               title={t.buscar}
             >
-              <span className="emoji-icon">🔍</span>
+              🔍
             </button>
             
             {searchOpen && (
-              <div className="search-panel">
+              <div className="search-panel" ref={searchPanelRef} onMouseDown={e => e.stopPropagation()}>
                 <form onSubmit={handleSearch}>
                   <div className="search-input-wrapper">
                     <span className="search-icon">🔍</span>
@@ -333,7 +406,7 @@ const Header = () => {
                       placeholder={t.buscarPlaceholder}
                       className="search-input"
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                       autoFocus
                     />
                   </div>
@@ -352,13 +425,13 @@ const Header = () => {
                   <div className="search-suggestions">
                     <p className="suggestion-title">{t.busquedasSugeridas}</p>
                     <button className="suggestion-item" onClick={() => navigate('/perfil')}>
-                      🏥 {t.misMedicos}
+                      M {t.misMedicos}
                     </button>
                     <button className="suggestion-item" onClick={() => navigate('/monitoreo')}>
-                      📊 {t.resultados}
+                      R {t.resultados}
                     </button>
                     <button className="suggestion-item" onClick={() => navigate('/perfil')}>
-                      💊 {t.medicamentos}
+                      P {t.medicamentos}
                     </button>
                   </div>
                 )}
@@ -373,14 +446,14 @@ const Header = () => {
               onClick={() => setNotificationOpen(!notificationOpen)}
               title={t.notificaciones}
             >
-              <span className="emoji-icon">🔔</span>
+              🔔
               <span className="notification-badge">3</span>
             </button>
             
             {notificationOpen && (
-              <div className="notification-panel">
+              <div className="notification-panel" ref={notificationPanelRef} onMouseDown={e => e.stopPropagation()}>
                 <div className="panel-header">
-                  <h3 className="panel-title">🔔 {t.notificaciones}</h3>
+                  <h3 className="panel-title">N {t.notificaciones}</h3>
                   <button className="mark-all-read" onClick={() => setNotificationOpen(false)}>
                     {t.marcarLeidas}
                   </button>
@@ -396,7 +469,7 @@ const Header = () => {
                       }}
                     >
                       <div className="notif-icon">
-                        {notif.tipo === 'cita' ? '📅' : notif.tipo === 'mensaje' ? '💬' : '⏰'}
+                        {notif.tipo === 'cita' ? 'C' : notif.tipo === 'mensaje' ? 'M' : 'R'}
                       </div>
                       <div className="notif-content">
                         <p className="notif-message">{notif.mensaje}</p>
@@ -425,13 +498,13 @@ const Header = () => {
               onClick={() => setLanguageOpen(!languageOpen)}
               title={t.idioma}
             >
-              <span className="emoji-icon">🌍</span>
+              🌐
             </button>
             
             {languageOpen && (
-              <div className="language-panel">
+              <div className="language-panel" ref={languagePanelRef} onMouseDown={e => e.stopPropagation()}>
                 <div className="panel-header">
-                  <h3 className="panel-title">🌍 {t.idioma}</h3>
+                  <h3 className="panel-title">I {t.idioma}</h3>
                 </div>
                 <div className="language-list">
                   {idiomas.map(idioma => (
@@ -457,13 +530,13 @@ const Header = () => {
               onClick={() => setAccessibilityOpen(!accessibilityOpen)}
               title={t.accesibilidad}
             >
-              <span className="emoji-icon">👁️</span>
+              ♿
             </button>
             
             {accessibilityOpen && (
-              <div className="accessibility-panel">
+              <div className="accessibility-panel" ref={accessibilityPanelRef} onMouseDown={e => e.stopPropagation()}>
                 <div className="panel-header">
-                  <h3 className="panel-title">♿ {t.accesibilidad}</h3>
+                  <h3 className="panel-title">A {t.accesibilidad}</h3>
                 </div>
                 <div className="accessibility-options">
                   <div className="accessibility-item">
@@ -553,7 +626,7 @@ const Header = () => {
             title={t.configuracion}
             onClick={() => navigate('/perfil')}
           >
-            <span className="emoji-icon">⚙️</span>
+            ⚙️
           </button>
 
           {/* Perfil de Usuario */}
@@ -565,17 +638,30 @@ const Header = () => {
               <div className="profile-avatar">
                 <span className="emoji-icon-small">👤</span>
               </div>
-              <span className="profile-name">Carlos Pérez</span>
+              <span className="profile-name">{userProfile ? `${userProfile.nombre} ${userProfile.apellido}` : 'Usuario'}</span>
               <span className="emoji-icon-small">▼</span>
             </button>
             
             {profileOpen && (
-              <div className="profile-panel">
+              <div className="profile-panel" ref={profilePanelRef} onMouseDown={e => e.stopPropagation()}>
                 <div className="profile-info">
                   <div className="profile-avatar-large">👤</div>
-                  <h3 className="profile-info-name">Carlos Pérez</h3>
-                  <p className="profile-info-email">carlos.perez@email.com</p>
-                  <span className="profile-role">Paciente</span>
+                  <h3 className="profile-info-name">{userProfile ? `${userProfile.nombre} ${userProfile.apellido}` : 'Usuario'}</h3>
+                  <p className="profile-info-email">{userProfile?.correo || 'usuario@email.com'}</p>
+                  <span className="profile-role">
+                    {userProfile?.tipo_usuario === 'adultoMayor' ? 'Paciente' : 
+                     userProfile?.tipo_usuario === 'cuidador' ? 'Cuidador' : 
+                     userProfile?.tipo_usuario === 'medico' ? 'Médico' : 'Usuario'}
+                  </span>
+                  {userProfile?.fecha_nacimiento && (
+                    <p className="profile-info-detail">Edad: {new Date().getFullYear() - new Date(userProfile.fecha_nacimiento).getFullYear()} años</p>
+                  )}
+                  {userProfile?.pais && (
+                    <p className="profile-info-detail">País: {userProfile.pais}</p>
+                  )}
+                  {userProfile?.nombre_usuario && (
+                    <p className="profile-info-detail">Usuario: {userProfile.nombre_usuario}</p>
+                  )}
                 </div>
                 <div className="profile-divider"></div>
                 <button 

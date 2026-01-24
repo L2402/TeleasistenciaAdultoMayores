@@ -10,6 +10,7 @@ const Login = () => {
     const [errorNombre, setErrorNombre] = useState(false);
     const [errorPassword, setErrorPassword] = useState(false);
     const [mostrarPassword, setMostrarPassword] = useState(false);
+    const [theme, setTheme] = useState<string>(localStorage.getItem('theme') || 'light');
     const [recordarme, setRecordarme] = useState(false);
     const [cargando, setCargando] = useState(false);
     // Por defecto mostrar el formulario como Adulto Mayor (no mostrar selector al cargar)
@@ -27,6 +28,20 @@ const Login = () => {
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
     }, []);
+
+    // Aplicar tema guardado
+    useEffect(() => {
+        try {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.remove('dark-theme');
+            }
+            localStorage.setItem('theme', theme);
+        } catch (e) {
+            // ignore
+        }
+    }, [theme]);
     
     //  ELIMINADO: validaciones visuales de color verde
     const [intentosFallidos, setIntentosFallidos] = useState(0);
@@ -164,7 +179,8 @@ const Login = () => {
                     setMensajeRol(null);
                 }
 
-                navigate("/home");
+                // Redirigir y recargar para que el layout lea el rol actualizado
+                window.location.href = "/home";
             } else {
                 // LOGIN FALLIDO
                 const nuevosIntentos = intentosFallidos + 1;
@@ -205,8 +221,11 @@ const Login = () => {
                         </div>
 
                         <div className="top-actions">
-                            <button className="top-btn" type="button" onClick={() => formRef.current?.scrollIntoView({behavior:'smooth'})}>Iniciar sesión</button>
-                            <button className="top-btn top-btn-secondary" type="button" onClick={() => navigate('/registro')}>Crear cuenta</button>
+                                    <button className="top-btn" type="button" onClick={() => formRef.current?.scrollIntoView({behavior:'smooth'})}>Iniciar sesión</button>
+                                    <button className="top-btn top-btn-secondary" type="button" onClick={() => navigate('/registro')}>Crear cuenta</button>
+                                    <button className="theme-toggle" type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label="Cambiar tema">
+                                        {theme === 'dark' ? '☀️ Claro' : '🌙 Oscuro'}
+                                    </button>
                         </div>
                     </div>
 
@@ -310,6 +329,8 @@ const Login = () => {
                                     {bloqueado ? `Bloqueado (${tiempoRestante}s)` : cargando ? "Iniciando sesión..." : "Iniciar Sesión"}
                                 </button>
                             </form>
+
+                            {/* Se eliminó el botón demo; usar el selector de rol y credenciales reales */}
 
                             <div className="recuperar-password">
                                 <p>¿Olvidaste tus datos? <button 

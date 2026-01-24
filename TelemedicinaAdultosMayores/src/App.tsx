@@ -15,8 +15,11 @@ import Citas from "./pages/adultoMayor/Citas";
 import Monitoreo from "./pages/adultoMayor/Monitoreo";
 import Mensajes from "./pages/adultoMayor/Mensajes";
 import Perfil from "./pages/adultoMayor/Perfil";
+import HistorialSesiones from "./pages/adultoMayor/HistorialSesiones";
 import RegistroMedicamentos from "./pages/medico/RegistroMedicamentos";
 import Incidencias from "./pages/adultoMayor/Incidencias";
+import RegistroAnimo from "./pages/adultoMayor/RegistroAnimo";
+import KYC from "./pages/adultoMayor/KYC";
 
 // páginas del médico
 import PanelMedico from "./pages/medico/PanelMedico";
@@ -34,10 +37,11 @@ import PreguntasFrecuentes from "./pages/legal/PreguntasFrecuentes";
 import Contacto from "./pages/legal/Contacto";
 
 const App = () => {
-  const rol = localStorage.getItem("rol") || "adultoMayor";
-
   // Layout base con header, sidebar y footer
-  const Layout = () => (
+  const Layout = () => {
+    const rol = localStorage.getItem("rol") || "adultoMayor";
+
+    return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       {/* Header superior fijo */}
       <Header />
@@ -63,6 +67,9 @@ const App = () => {
                   <Route path="/monitoreo" element={<Monitoreo />} />
                   <Route path="/mensajes" element={<Mensajes />} />
                   <Route path="/incidencias" element={<Incidencias />} />
+                  <Route path="/registro-animo" element={<RegistroAnimo />} />
+                  <Route path="/kyc" element={<KYC />} />
+                  <Route path="/historial-sesiones" element={<HistorialSesiones />} />
                   <Route path="/perfil" element={<Perfil />} />
                 </>
               )}
@@ -103,6 +110,8 @@ const App = () => {
     </div>
   );
 
+  };
+
   return (
     <Routes>
       {/*  Rutas públicas */}
@@ -117,5 +126,4 @@ const App = () => {
     </Routes>
   );
 };
-
 export default App;

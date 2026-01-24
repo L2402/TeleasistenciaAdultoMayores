@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../../styles/perfil.css";
 
 interface UsuarioInfo {
@@ -20,18 +20,104 @@ const Perfil = () => {
   const [seccionActiva, setSeccionActiva] = useState<"personal" | "medica" | "seguridad">("personal");
   
   const [usuario, setUsuario] = useState<UsuarioInfo>({
-    nombre: "Carlos Pérez",
-    email: "carlos.perez@email.com",
-    telefono: "+593 98 765 4321",
-    fechaNacimiento: "1950-05-15",
-    direccion: "Av. Principal 123, Quito, Ecuador",
-    tipoSangre: "O+",
-    alergias: "Penicilina, Polen",
-    condicionesMedicas: "Hipertensión, Diabetes tipo 2",
-    medicamentos: "Metformina 850mg (2 veces al día), Enalapril 10mg (1 vez al día)",
-    contactoEmergencia: "María Pérez (Hija)",
-    telefonoEmergencia: "+593 99 123 4567"
+    nombre: "",
+    email: "",
+    telefono: "",
+    fechaNacimiento: "",
+    direccion: "",
+    tipoSangre: "",
+    alergias: "",
+    condicionesMedicas: "",
+    medicamentos: "",
+    contactoEmergencia: "",
+    telefonoEmergencia: ""
   });
+
+  useEffect(() => {
+    const perfilRaw = localStorage.getItem('usuario_perfil');
+    if (perfilRaw) {
+      try {
+        const perfil = JSON.parse(perfilRaw);
+        setUsuario({
+          nombre: `${perfil.nombre} ${perfil.apellido}`,
+          email: perfil.correo,
+          telefono: perfil.telefono || "",
+          fechaNacimiento: perfil.fecha_nacimiento || "",
+          direccion: perfil.direccion || "",
+          tipoSangre: perfil.tipo_sangre || "",
+          alergias: perfil.alergias || "",
+          condicionesMedicas: perfil.condiciones_medicas || "",
+          medicamentos: perfil.medicamentos || "",
+          contactoEmergencia: perfil.contacto_emergencia || "",
+          telefonoEmergencia: perfil.telefono_emergencia || ""
+        });
+      } catch (error) {
+        console.error('Error parsing user profile:', error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    setUsuarioTemp(usuario);
+  }, [usuario]);
+
+  useEffect(() => {
+    const handleProfileChange = () => {
+      const perfilRaw = localStorage.getItem('usuario_perfil');
+      if (perfilRaw) {
+        try {
+          const perfil = JSON.parse(perfilRaw);
+          setUsuario({
+            nombre: `${perfil.nombre} ${perfil.apellido}`,
+            email: perfil.correo,
+            telefono: perfil.telefono || "",
+            fechaNacimiento: perfil.fecha_nacimiento || "",
+            direccion: perfil.direccion || "",
+            tipoSangre: perfil.tipo_sangre || "",
+            alergias: perfil.alergias || "",
+            condicionesMedicas: perfil.condiciones_medicas || "",
+            medicamentos: perfil.medicamentos || "",
+            contactoEmergencia: perfil.contacto_emergencia || "",
+            telefonoEmergencia: perfil.telefono_emergencia || ""
+          });
+        } catch (error) {
+          console.error('Error parsing user profile:', error);
+          setUsuario({
+            nombre: "",
+            email: "",
+            telefono: "",
+            fechaNacimiento: "",
+            direccion: "",
+            tipoSangre: "",
+            alergias: "",
+            condicionesMedicas: "",
+            medicamentos: "",
+            contactoEmergencia: "",
+            telefonoEmergencia: ""
+          });
+        }
+      } else {
+        setUsuario({
+          nombre: "",
+          email: "",
+          telefono: "",
+          fechaNacimiento: "",
+          direccion: "",
+          tipoSangre: "",
+          alergias: "",
+          condicionesMedicas: "",
+          medicamentos: "",
+          contactoEmergencia: "",
+          telefonoEmergencia: ""
+        });
+      }
+    };
+
+    window.addEventListener('userProfileChanged', handleProfileChange);
+    return () => {
+      window.removeEventListener('userProfileChanged', handleProfileChange);
+    };
+  }, []);
 
   const [usuarioTemp, setUsuarioTemp] = useState<UsuarioInfo>(usuario);
 

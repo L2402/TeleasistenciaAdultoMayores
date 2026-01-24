@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { Mail, Twitter, Linkedin } from "lucide-react";
 import "../styles/footer.css";
 import { useLang } from '../contexts/LanguageContext';
 

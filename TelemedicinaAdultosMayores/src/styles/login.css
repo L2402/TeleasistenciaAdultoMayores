@@ -685,3 +685,73 @@ button:disabled {
   .floating-card { position: relative; right: 0; top: 0; width: 100%; }
 }
 
+/* ===== OVERRIDES Y MEJORAS ADICIONALES ===== */
+:root {
+  --bg: #f7faf9;
+  --surface: #ffffff;
+  --muted: #6b7280;
+  --accent: #0f766e;
+  --accent-2: #28b1a9;
+  --danger: #dc3545;
+  --success: #065f46;
+  --card-shadow: 0 12px 36px rgba(6,20,30,0.12);
+  --focus: rgba(15,118,110,0.12);
+}
+
+.dark-theme {
+  --bg: #071021;
+  --surface: #071021;
+  --muted: #94a3b8;
+  --accent: #2dd4bf;
+  --accent-2: #059669;
+  --danger: #f87171;
+  --success: #34d399;
+  --card-shadow: 0 12px 36px rgba(0,0,0,0.6);
+  --focus: rgba(45,212,191,0.08);
+  color-scheme: dark;
+}
+
+/* Modernizar tarjeta */
+.login-card {
+  background: var(--surface) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--card-shadow) !important;
+  border: 1px solid rgba(12,32,48,0.04) !important;
+}
+
+.login-card h1, .sistema-nombre {
+  color: var(--accent) !important;
+}
+
+.form-group label { color: var(--muted) !important; }
+.form-group input { border-radius: 10px !important; border: 1px solid rgba(15,23,42,0.06) !important; }
+.form-group input:focus { box-shadow: 0 8px 24px var(--focus) !important; border-color: var(--accent-2) !important; }
+.form-group input.input-error { border-color: var(--danger) !important; background-color: rgba(220,53,69,0.03) !important; }
+
+button[type="submit"] { background: linear-gradient(180deg,var(--accent-2),var(--accent)) !important; border-radius: 10px !important; }
+
+.mensaje-error-login { border-color: rgba(220,53,69,0.14) !important; }
+
+/* Hero image visible y animaciones mejoradas */
+.hero-image { opacity: 1 !important; transform: translateX(0) scale(1) !important; }
+.floating-card { transition: transform 360ms cubic-bezier(.2,.9,.3,1), box-shadow 360ms ease !important; }
+
+/* Selector de tema */
+.theme-toggle {
+  background: transparent;
+  border: 1px solid rgba(15,118,110,0.08);
+  color: var(--accent);
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.theme-toggle:focus { outline: none; box-shadow: 0 6px 18px var(--focus); }
+
+@media (max-width: 700px) {
+  .hero { padding: 12px; }
+  .hero-left { padding: 12px; }
+}
+
+

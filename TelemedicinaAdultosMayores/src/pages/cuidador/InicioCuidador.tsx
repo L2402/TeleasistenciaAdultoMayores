@@ -1,15 +1,31 @@
 import "../../styles/home.css";
 import { Users, CalendarDays, MessageSquare, HeartPulse, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const InicioCuidador = () => {
-  const cuidador = "María López";
+  const [cuidador, setCuidador] = useState<string>("Cuidador");
   const adultosACargo = 3;
   const proximaCita = {
     fecha: "18 de enero, 09:00 AM",
     paciente: "Carlos Pérez"
   };
   const navigate = useNavigate();
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('usuario_perfil');
+      if (raw) {
+        const perfil = JSON.parse(raw) as any;
+        const nombre = perfil.nombre || perfil.nombre_completo || perfil.nombreUsuario || perfil.nombre_usuario || "Cuidador";
+        const apellido = perfil.apellido || perfil.apellido_usuario || "";
+        const display = (nombre && apellido) ? `${nombre} ${apellido}` : (nombre || "Cuidador");
+        setCuidador(display);
+      }
+    } catch (err) {
+      // ignore
+    }
+  }, []);
 
   return (
     <div className="home-container">

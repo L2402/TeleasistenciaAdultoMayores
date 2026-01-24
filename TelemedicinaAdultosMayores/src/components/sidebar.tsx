@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Home, Calendar, HeartPulse, Users, MessageSquare, LogOut, UserCog, Stethoscope, Pill, AlertCircle } from "lucide-react";
+import { Home, Calendar, HeartPulse, Users, MessageSquare, LogOut, UserCog, Stethoscope, Pill, AlertCircle, User } from "lucide-react";
 import "../styles/sidebar.css";
 import React from "react";
 
@@ -23,6 +23,9 @@ const Sidebar = ({ rol }: SidebarProps) => {
       { icon: <Calendar size={20} />, text: "Mis citas", path: "/citas" },
       { icon: <HeartPulse size={20} />, text: "Monitoreo", path: "/monitoreo" },
       { icon: <MessageSquare size={20} />, text: "Mensajes", path: "/mensajes" },
+    { icon: <Calendar size={20} />, text: "Historial", path: "/historial-sesiones" },
+    { icon: <HeartPulse size={20} />, text: "Registro anímico", path: "/registro-animo" },
+    { icon: <User size={20} />, text: "Verificación (KYC)", path: "/kyc" },
       { icon: <AlertCircle size={20} />, text: "Incidencias", path: "/incidencias" },
       { icon: <UserCog size={20} />, text: "Perfil", path: "/perfil" },
     ],
