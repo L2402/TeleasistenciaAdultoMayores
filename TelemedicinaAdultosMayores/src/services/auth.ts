@@ -29,26 +29,26 @@ export const login = async (identificador: string, password: string): Promise<Lo
     // Si no es un email, buscar el email asociado al nombre de usuario
     if (!identificador.includes('@')) {
       const { data: usuarioData, error: usuarioError } = await supabase
-        .from('usuarios')
-        .select('correo')
-        .ilike('nombre_usuario', identificador)
-        .limit(1)
+        .rpc('buscar_usuario_por_nombre', { nombre_usuario_buscar: identificador })
         .maybeSingle()
 
       if (usuarioError) {
+        console.error('Error al buscar usuario:', usuarioError);
         return {
           success: false,
-          error: 'Error al buscar usuario'
+          error: 'Error al buscar usuario en la base de datos'
         }
       }
 
-      if (!usuarioData) {
+      if (!usuarioData || !usuarioData.correo) {
+        console.error('Usuario no encontrado en tabla usuarios:', identificador);
         return {
           success: false,
-          error: 'Usuario no registrado'
+          error: 'Usuario no registrado. Por favor verifica tu nombre de usuario.'
         }
       }
 
+      console.log('Usuario encontrado:', usuarioData.nombre_usuario);
       email = usuarioData.correo
     }
 
@@ -130,24 +130,39 @@ export const login = async (identificador: string, password: string): Promise<Lo
  */
 export const registrar = async (datos: RegistroData): Promise<{ success: boolean; error?: string; user?: any }> => {
   try {
-    // Validar unicidad de nombre_usuario y correo
-    const { data: existingUser, error: checkError } = await supabase
+    // Validar unicidad de nombre_usuario
+    const { data: usuarioExistente, error: checkError1 } = await supabase
       .from('usuarios')
       .select('id')
-      .or(`nombre_usuario.ilike.${datos.nombreUsuario},correo.ilike.${datos.correo}`)
+      .eq('nombre_usuario', datos.nombreUsuario)
       .maybeSingle()
 
-    if (checkError) {
+    if (usuarioExistente) {
       return {
         success: false,
-        error: 'Error al verificar unicidad del usuario'
+        error: 'El nombre de usuario ya está registrado'
       }
     }
 
-    if (existingUser) {
+    // Validar unicidad de correo
+    const { data: correoExistente, error: checkError2 } = await supabase
+      .from('usuarios')
+      .select('id')
+      .eq('correo', datos.correo)
+      .maybeSingle()
+
+    if (correoExistente) {
       return {
         success: false,
-        error: 'El nombre de usuario o correo electrónico ya están registrados'
+        error: 'El correo electrónico ya está registrado'
+      }
+    }
+
+    if (checkError1 || checkError2) {
+      console.error('Error al verificar unicidad:', checkError1 || checkError2);
+      return {
+        success: false,
+        error: 'Error al verificar disponibilidad'
       }
     }
 
@@ -181,99 +196,51 @@ export const registrar = async (datos: RegistroData): Promise<{ success: boolean
       }
     }
 
-    // 2. Si hay sesión inmediata (confirmación de email deshabilitada), insertar directamente
-    if (authData.session) {
-      try {
-        const { error: dbError } = await supabase
-          .from('usuarios')
-          .insert({
-            id: authData.user.id,
-            nombre: datos.nombre,
-            apellido: datos.apellido,
-            nombre_usuario: datos.nombreUsuario,
-            correo: datos.correo,
-            pais: datos.pais,
-            fecha_nacimiento: datos.fechaNacimiento,
-            tipo_usuario: datos.tipoUsuario,
-            created_at: new Date().toISOString()
-          })
+    // 2. Guardar datos del usuario en la tabla usando función SQL (sin RLS)
+    try {
+      console.log('Guardando usuario en BD:', authData.user.id);
+      const { error: dbError } = await supabase.rpc('register_user', {
+        user_id: authData.user.id,
+        p_nombre: datos.nombre,
+        p_apellido: datos.apellido,
+        p_nombre_usuario: datos.nombreUsuario,
+        p_correo: datos.correo,
+        p_pais: datos.pais,
+        p_fecha_nacimiento: datos.fechaNacimiento,
+        p_tipo_usuario: datos.tipoUsuario
+      })
 
-        if (dbError) {
-          console.error('Error al guardar en BD:', dbError)
-          return {
-            success: false,
-            error: 'Usuario creado pero no se pudieron guardar los datos adicionales'
-          }
+      if (dbError) {
+        console.error('❌ Error al guardar en BD:', dbError);
+        return {
+          success: false,
+          error: `Error al guardar datos: ${dbError.message}`
         }
+      }
 
+      console.log('✅ Usuario guardado correctamente en BD');
+      
+      // Si hay sesión inmediata, el usuario está completamente registrado
+      if (authData.session) {
         return {
           success: true,
           user: authData.user
         }
-      } catch (error: any) {
-        console.error('Error al insertar en BD:', error)
-        return {
-          success: false,
-          error: error.message || 'Error al guardar datos del usuario'
-        }
+      }
+
+      // Si requiere confirmación de email, avisar al usuario
+      return {
+        success: true,
+        user: authData.user,
+        message: 'Usuario creado. Por favor confirma tu email.'
+      }
+    } catch (error: any) {
+      console.error('❌ Error al insertar en BD:', error);
+      return {
+        success: false,
+        error: error.message || 'Error al guardar datos del usuario'
       }
     }
-
-    // 3. Si requiere confirmación de email, esperar evento SIGNED_IN
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        subscription.unsubscribe()
-        resolve({
-          success: true,
-          user: authData.user,
-          error: 'Usuario creado. Por favor confirma tu email para completar el registro.'
-        })
-      }, 5000) // Reducido a 5 segundos
-
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, session) => {
-          if (event === 'SIGNED_IN' && session) {
-            clearTimeout(timeout)
-            subscription.unsubscribe()
-            
-            try {
-              const { error: dbError } = await supabase
-                .from('usuarios')
-                .insert({
-                  id: session.user.id,
-                  nombre: datos.nombre,
-                  apellido: datos.apellido,
-                  nombre_usuario: datos.nombreUsuario,
-                  correo: datos.correo,
-                  pais: datos.pais,
-                  fecha_nacimiento: datos.fechaNacimiento,
-                  tipo_usuario: datos.tipoUsuario,
-                  created_at: new Date().toISOString()
-                })
-
-              if (dbError) {
-                console.error('Error al guardar en BD:', dbError)
-                resolve({
-                  success: false,
-                  error: 'Usuario creado pero no se pudieron guardar los datos adicionales'
-                })
-              } else {
-                resolve({
-                  success: true,
-                  user: session.user
-                })
-              }
-            } catch (error: any) {
-              console.error('Error al insertar en BD:', error)
-              resolve({
-                success: false,
-                error: error.message || 'Error al guardar datos del usuario'
-              })
-            }
-          }
-        }
-      )
-    })
   } catch (error: any) {
     console.error('Error en registro:', error)
     return {

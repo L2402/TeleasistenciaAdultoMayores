@@ -1,53 +1,56 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../../styles/citas.css";
-
-interface Cita {
-  id: number;
-  fecha: string;
-  hora: string;
-  doctor: string;
-  especialidad: string;
-  estado: "pendiente" | "confirmada" | "completada";
-  motivo: string;
-}
+import { obtenerCitasUsuario, actualizarCita, Cita } from "../../services/citas";
+import AgendarCita from "./AgendarCita";
 
 const Citas = () => {
-  const [citas] = useState<Cita[]>([
-    {
-      id: 1,
-      fecha: "2025-10-25",
-      hora: "10:00 AM",
-      doctor: "Dra. María Gómez",
-      especialidad: "Cardiología",
-      estado: "confirmada",
-      motivo: "Control de presión arterial"
-    },
-    {
-      id: 2,
-      fecha: "2025-11-02",
-      hora: "3:00 PM",
-      doctor: "Dr. Juan Martínez",
-      especialidad: "Medicina General",
-      estado: "pendiente",
-      motivo: "Chequeo general"
-    },
-    {
-      id: 3,
-      fecha: "2025-10-20",
-      hora: "11:30 AM",
-      doctor: "Dra. Ana López",
-      especialidad: "Neurología",
-      estado: "completada",
-      motivo: "Revisión de resultados"
-    }
-  ]);
-
+  const [citas, setCitas] = useState<Cita[]>([]);
   const [filtro, setFiltro] = useState<string>("todas");
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+
+  const cargarCitas = async () => {
+    try {
+      setCargando(true);
+      setError(null);
+      
+      // Obtener ID del usuario desde localStorage
+      const perfilJson = localStorage.getItem('usuario_perfil');
+      if (!perfilJson) {
+        setError('No se encontró el usuario');
+        return;
+      }
+      
+      const perfil = JSON.parse(perfilJson);
+      const citasData = await obtenerCitasUsuario(perfil.id);
+      setCitas(citasData);
+    } catch (err: any) {
+      setError('Error al cargar las citas');
+      console.error(err);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  useEffect(() => {
+    cargarCitas();
+  }, []);
 
   const citasFiltradas = citas.filter(cita => {
     if (filtro === "todas") return true;
     return cita.estado === filtro;
   });
+
+  const handleConfirmarCita = async (citaId: string) => {
+    await actualizarCita(citaId, { estado: 'confirmada' });
+    setCitas(citas.map(c => c.id === citaId ? { ...c, estado: 'confirmada' } : c));
+  };
+
+  const handleCancelarCita = async (citaId: string) => {
+    await actualizarCita(citaId, { estado: 'cancelada' });
+    setCitas(citas.map(c => c.id === citaId ? { ...c, estado: 'cancelada' } : c));
+  };
 
   const getEstadoColor = (estado: string) => {
     switch (estado) {
@@ -57,6 +60,8 @@ const Citas = () => {
         return "estado-pendiente";
       case "completada":
         return "estado-completada";
+      case "cancelada":
+        return "estado-cancelada";
       default:
         return "";
     }
@@ -70,10 +75,15 @@ const Citas = () => {
         return "Pendiente";
       case "completada":
         return "Completada";
+      case "cancelada":
+        return "Cancelada";
       default:
         return estado;
     }
   };
+
+  if (cargando) return <div className="citas-container"><p>Cargando citas...</p></div>;
+  if (error) return <div className="citas-container"><p style={{color: '#b91c1c'}}>{error}</p></div>;
 
   return (
     <div className="citas-container">
@@ -149,7 +159,7 @@ const Citas = () => {
                   <span className="icon">👨‍⚕️</span>
                   <div>
                     <p className="label">Doctor</p>
-                    <p className="value">{cita.doctor}</p>
+                    <p className="value">{cita.medico ? `${cita.medico.nombre} ${cita.medico.apellido}` : 'No asignado'}</p>
                   </div>
                 </div>
 
@@ -165,14 +175,14 @@ const Citas = () => {
               <div className="cita-actions">
                 {cita.estado === "pendiente" && (
                   <>
-                    <button className="btn-confirmar">Confirmar</button>
-                    <button className="btn-cancelar">Cancelar</button>
+                    <button className="btn-confirmar" onClick={() => handleConfirmarCita(cita.id)}>Confirmar</button>
+                    <button className="btn-cancelar" onClick={() => handleCancelarCita(cita.id)}>Cancelar</button>
                   </>
                 )}
                 {cita.estado === "confirmada" && (
                   <>
                     <button className="btn-recordatorio">Recordatorio</button>
-                    <button className="btn-cancelar">Cancelar</button>
+                    <button className="btn-cancelar" onClick={() => handleCancelarCita(cita.id)}>Cancelar</button>
                   </>
                 )}
                 {cita.estado === "completada" && (
@@ -184,9 +194,24 @@ const Citas = () => {
         )}
       </div>
 
-      <button className="btn-nueva-cita">
+      <button className="btn-nueva-cita" onClick={() => setMostrarFormulario(true)}>
         <span>+</span> Agendar Nueva Cita
       </button>
+
+      {/* Modal para agendar cita */}
+      {mostrarFormulario && (
+        <div className="modal-overlay" onClick={() => setMostrarFormulario(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <AgendarCita 
+              onCitaCreada={() => {
+                setMostrarFormulario(false);
+                cargarCitas();
+              }}
+              onCerrar={() => setMostrarFormulario(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

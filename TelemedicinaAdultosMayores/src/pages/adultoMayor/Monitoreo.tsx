@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../../styles/monitoreo.css";
+import { crearMonitoreo, obtenerMonitoreos, Monitoreo as MonitoreoType } from "../../services/monitoreo";
 
 interface Medicion {
   id: number;
@@ -11,38 +12,61 @@ interface Medicion {
 }
 
 const Monitoreo = () => {
-  const [mediciones, setMediciones] = useState<Medicion[]>([
-    {
-      id: 1,
-      tipo: "presion",
-      valor: "120/80",
-      fecha: "2025-10-22",
-      hora: "08:30 AM",
-      nota: "Después del desayuno"
-    },
-    {
-      id: 2,
-      tipo: "glucosa",
-      valor: "95 mg/dL",
-      fecha: "2025-10-22",
-      hora: "07:00 AM",
-      nota: "En ayunas"
-    },
-    {
-      id: 3,
-      tipo: "peso",
-      valor: "72 kg",
-      fecha: "2025-10-21",
-      hora: "06:00 AM"
-    },
-    {
-      id: 4,
-      tipo: "oxigeno",
-      valor: "98%",
-      fecha: "2025-10-21",
-      hora: "10:00 AM"
-    }
-  ]);
+  const [mediciones, setMediciones] = useState<Medicion[]>([]);
+  const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+    const cargar = async () => {
+      try {
+        const perfilJson = localStorage.getItem('usuario_perfil');
+        if (!perfilJson) return;
+        
+        const perfil = JSON.parse(perfilJson);
+        const data = await obtenerMonitoreos(perfil.id);
+        
+        // Convertir datos de BD a formato del componente
+        const medicionesConvertidas: Medicion[] = data.map((m: MonitoreoType) => {
+          const fecha = new Date(m.fecha_medicion);
+          let tipo: Medicion["tipo"] = "presion";
+          let valor = "";
+          
+          if (m.presion_arterial) {
+            tipo = "presion";
+            valor = m.presion_arterial;
+          } else if (m.glucosa) {
+            tipo = "glucosa";
+            valor = `${m.glucosa} mg/dL`;
+          } else if (m.peso) {
+            tipo = "peso";
+            valor = `${m.peso} kg`;
+          } else if (m.saturacion_oxigeno) {
+            tipo = "oxigeno";
+            valor = `${m.saturacion_oxigeno}%`;
+          } else if (m.temperatura) {
+            tipo = "temperatura";
+            valor = `${m.temperatura}°C`;
+          }
+          
+          return {
+            id: parseInt(m.id.replace(/-/g, '').substring(0, 10), 16),
+            tipo,
+            valor,
+            fecha: fecha.toISOString().split('T')[0],
+            hora: fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+            nota: m.notas
+          };
+        });
+        
+        setMediciones(medicionesConvertidas);
+      } catch (err) {
+        console.error('Error al cargar monitoreos:', err);
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    cargar();
+  }, []);
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [filtroTipo, setFiltroTipo] = useState<string>("todas");
@@ -65,7 +89,7 @@ const Monitoreo = () => {
     return tiposMedicion.find(t => t.id === tipo) || tiposMedicion[0];
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!nuevaMedicion.valor) {
@@ -73,19 +97,61 @@ const Monitoreo = () => {
       return;
     }
 
-    const ahora = new Date();
-    const nuevaM: Medicion = {
-      id: Date.now(),
-      tipo: nuevaMedicion.tipo,
-      valor: nuevaMedicion.valor,
-      fecha: ahora.toISOString().split('T')[0],
-      hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-      nota: nuevaMedicion.nota
-    };
+    try {
+      const perfilJson = localStorage.getItem('usuario_perfil');
+      if (!perfilJson) {
+        alert('Usuario no encontrado');
+        return;
+      }
+      
+      const perfil = JSON.parse(perfilJson);
+      const ahora = new Date().toISOString();
+      
+      // Preparar datos según el tipo de medición
+      const datosMonitoreo: any = {
+        usuario_id: perfil.id,
+        fecha_medicion: ahora,
+        notas: nuevaMedicion.nota
+      };
+      
+      switch (nuevaMedicion.tipo) {
+        case 'presion':
+          datosMonitoreo.presion_arterial = nuevaMedicion.valor;
+          break;
+        case 'glucosa':
+          datosMonitoreo.glucosa = parseInt(nuevaMedicion.valor);
+          break;
+        case 'peso':
+          datosMonitoreo.peso = parseFloat(nuevaMedicion.valor);
+          break;
+        case 'temperatura':
+          datosMonitoreo.temperatura = parseFloat(nuevaMedicion.valor);
+          break;
+        case 'oxigeno':
+          datosMonitoreo.saturacion_oxigeno = parseFloat(nuevaMedicion.valor);
+          break;
+      }
+      
+      const nueva = await crearMonitoreo(datosMonitoreo);
+      
+      if (nueva) {
+        const fecha = new Date(nueva.fecha_medicion);
+        const nuevaM: Medicion = {
+          id: Date.now(),
+          tipo: nuevaMedicion.tipo,
+          valor: nuevaMedicion.valor,
+          fecha: fecha.toISOString().split('T')[0],
+          hora: fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+          nota: nuevaMedicion.nota
+        };
 
-    setMediciones([nuevaM, ...mediciones]);
-    setNuevaMedicion({ tipo: "presion", valor: "", nota: "" });
-    setMostrarFormulario(false);
+        setMediciones([nuevaM, ...mediciones]);
+        setNuevaMedicion({ tipo: "presion", valor: "", nota: "" });
+        setMostrarFormulario(false);
+      }
+    } catch (err: any) {
+      alert(err.message || 'Error al guardar medición');
+    }
   };
 
   const medicionesFiltradas = mediciones.filter(m => {

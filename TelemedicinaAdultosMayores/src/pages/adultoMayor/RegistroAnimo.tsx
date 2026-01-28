@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../../styles/animo.css";
-
-// Persistencia en localStorage: clave `registro_animo_<userId>` o `registro_animo`
-
-type Registro = {
-  id: string;
-  fecha: string;
-  estado: string;
-  motivo: string;
-  observaciones: string;
-};
+import { crearRegistroAnimo, obtenerRegistrosAnimo, RegistroAnimo as RegistroAnimoType } from "../../services/registroAnimo";
 
 const opcionesEstado = ["Feliz", "Triste", "Preocupado", "Cansado", "Enojado", "Neutral"];
 
@@ -17,30 +8,35 @@ const RegistroAnimo: React.FC = () => {
   const [estado, setEstado] = useState<string>(opcionesEstado[0]);
   const [motivo, setMotivo] = useState<string>("");
   const [observaciones, setObservaciones] = useState<string>("");
-  const [registros, setRegistros] = useState<Registro[]>(() => []);
+  const [registros, setRegistros] = useState<RegistroAnimoType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [enviado, setEnviado] = useState<boolean>(false);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    cargarRegistros();
+  }, []);
+
+  const cargarRegistros = async () => {
     try {
-      const userId = localStorage.getItem("userId");
-      const key = userId ? `registro_animo_${userId}` : "registro_animo";
-      const raw = localStorage.getItem(key);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Registro[];
-        setRegistros(parsed.sort((a, b) => +new Date(b.fecha) - +new Date(a.fecha)));
-      } else {
-        setRegistros([]);
+      setLoading(true);
+      setError(null);
+      
+      const perfilJson = localStorage.getItem('usuario_perfil');
+      if (!perfilJson) {
+        setError('Usuario no encontrado');
+        return;
       }
+      
+      const perfil = JSON.parse(perfilJson);
+      const registrosData = await obtenerRegistrosAnimo(perfil.id);
+      setRegistros(registrosData);
     } catch (err: any) {
-      setError("Error leyendo registros desde localStorage");
-      setRegistros([]);
+      setError(err.message || 'Error al cargar registros');
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   const resetForm = () => {
     setEstado(opcionesEstado[0]);
@@ -48,27 +44,35 @@ const RegistroAnimo: React.FC = () => {
     setObservaciones("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const nuevo: Registro = {
-      id: Date.now().toString(),
-      fecha: new Date().toISOString(),
-      estado,
-      motivo,
-      observaciones,
-    };
+    
     try {
-      const userId = localStorage.getItem("userId");
-      const key = userId ? `registro_animo_${userId}` : "registro_animo";
-      const almacenadosRaw = localStorage.getItem(key);
-      const almacenados = almacenadosRaw ? (JSON.parse(almacenadosRaw) as Registro[]) : [];
-      const nuevos = [nuevo, ...almacenados];
-      localStorage.setItem(key, JSON.stringify(nuevos));
-      setRegistros(nuevos);
-      resetForm();
-      setError(null);
+      const perfilJson = localStorage.getItem('usuario_perfil');
+      if (!perfilJson) {
+        setError('Usuario no encontrado');
+        return;
+      }
+      
+      const perfil = JSON.parse(perfilJson);
+      
+      const nuevoRegistro = await crearRegistroAnimo({
+        usuario_id: perfil.id,
+        fecha: new Date().toISOString(),
+        estado: estado as 'Feliz' | 'Triste' | 'Preocupado' | 'Cansado' | 'Enojado' | 'Neutral',
+        motivo: motivo,
+        observaciones: observaciones,
+      });
+
+      if (nuevoRegistro) {
+        setRegistros([nuevoRegistro, ...registros]);
+        resetForm();
+        setError(null);
+        setEnviado(true);
+        setTimeout(() => setEnviado(false), 3000);
+      }
     } catch (err: any) {
-      setError(err.message || "Error al guardar en localStorage");
+      setError(err.message || 'Error al guardar registro');
     }
   };
 
@@ -76,11 +80,14 @@ const RegistroAnimo: React.FC = () => {
     <div className="home-container">
       <h2>Registro de Estado Anímico</h2>
 
+      {enviado && <div style={{backgroundColor: '#22c55e', color: 'white', padding: '1rem', borderRadius: '4px', marginBottom: '1rem'}}>✅ Registro guardado correctamente</div>}
+      {error && <div style={{backgroundColor: '#ef4444', color: 'white', padding: '1rem', borderRadius: '4px', marginBottom: '1rem'}}>{error}</div>}
+
       <form onSubmit={handleSubmit} style={{ marginBottom: 16 }}>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div>
             <label>Estado emocional</label>
-            <select value={estado} onChange={(e) => setEstado(e.target.value)}>
+            <select value={estado} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setEstado(e.target.value)}>
               {opcionesEstado.map((o) => (
                 <option key={o} value={o}>{o}</option>
               ))}
@@ -89,12 +96,12 @@ const RegistroAnimo: React.FC = () => {
 
           <div style={{ flex: 1, minWidth: 220 }}>
             <label>Motivo</label>
-            <input value={motivo} onChange={(e) => setMotivo(e.target.value)} placeholder="Breve motivo" />
+            <input value={motivo} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMotivo(e.target.value)} placeholder="Breve motivo" />
           </div>
 
           <div style={{ flexBasis: "100%" }}>
             <label>Observaciones adicionales</label>
-            <textarea value={observaciones} onChange={(e) => setObservaciones(e.target.value)} rows={3} placeholder="Detalles opcionales" />
+            <textarea value={observaciones} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setObservaciones(e.target.value)} rows={3} placeholder="Detalles opcionales" />
           </div>
 
           <div>
@@ -105,7 +112,6 @@ const RegistroAnimo: React.FC = () => {
 
       <h3>Registros recientes</h3>
       {loading && <p>Cargando registros...</p>}
-      {error && <p style={{ color: "#b91c1c" }}>{error}</p>}
       <div style={{ overflowX: "auto" }}>
         <table className="historial-table" style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
@@ -124,7 +130,7 @@ const RegistroAnimo: React.FC = () => {
             )}
             {registros.map((r) => (
               <tr key={r.id}>
-                <td>{new Date(r.fecha).toLocaleString()}</td>
+                <td>{new Date(r.fecha).toLocaleString('es-ES')}</td>
                 <td>{r.estado}</td>
                 <td>{r.motivo}</td>
                 <td>{r.observaciones}</td>
