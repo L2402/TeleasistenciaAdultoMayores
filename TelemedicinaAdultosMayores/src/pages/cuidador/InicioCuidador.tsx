@@ -38,7 +38,7 @@ const InicioCuidador = () => {
         <p className="home-subtitle">Desde aquí puedes gestionar a los adultos a tu cargo, sus citas y comunicaciones.</p>
 
         <div className="cards-container">
-          <div className="card" onClick={() => navigate("/usuarios")}>
+          <div className="card" onClick={() => navigate("/adultos")}>
             <Users size={32} color="#1d4ed8" />
             <h3>Adultos a cargo</h3>
             <p>{adultosACargo} personas</p>

@@ -41,8 +41,9 @@ const Sidebar = ({ rol }: SidebarProps) => {
     ],
     cuidador: [
       { icon: <Home size={20} />, text: "Inicio", path: "/home" },
-      { icon: <Users size={20} />, text: "Adultos a cargo", path: "/usuarios" },
+      { icon: <Users size={20} />, text: "Adultos a cargo", path: "/adultos" },
       { icon: <Calendar size={20} />, text: "Citas", path: "/citas" },
+      { icon: <Pill size={20} />, text: "Medicamentos", path: "/medicamentos" },
       { icon: <MessageSquare size={20} />, text: "Mensajes", path: "/mensajes" },
       { icon: <UserCog size={20} />, text: "Perfil", path: "/perfil" },
     ],

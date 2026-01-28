@@ -33,6 +33,9 @@ import Reportes from "./pages/medico/Reportes";
 // páginas del cuidador
 import InicioCuidador from "./pages/cuidador/InicioCuidador";
 import Adultos from "./pages/cuidador/Adultos";
+import BuscarAdultos from "./pages/cuidador/BuscarAdultos";
+import CitasCuidador from "./pages/cuidador/CitasCuidador";
+import MedicamentosCuidador from "./pages/cuidador/MedicamentosCuidador";
 
 //  Páginas legales
 import PoliticaPrivacidad from "./pages/legal/PoliticaPrivacidad";
@@ -92,7 +95,9 @@ const App = () => {
               {rol === "cuidador" && (
                 <>
                   <Route path="/home" element={<InicioCuidador />} />
-                  <Route path="/usuarios" element={<Adultos />} />
+                  <Route path="/adultos" element={<BuscarAdultos />} />
+                  <Route path="/citas" element={<CitasCuidador />} />
+                  <Route path="/medicamentos" element={<MedicamentosCuidador />} />
                 </>
               )}
 
