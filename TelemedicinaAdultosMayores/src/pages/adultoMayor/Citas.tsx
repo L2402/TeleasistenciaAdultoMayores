@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import "../../styles/citas.css";
 import { obtenerCitasUsuario, actualizarCita, Cita } from "../../services/citas";
-import AgendarCita from "./AgendarCita";
 
 const Citas = () => {
   const [citas, setCitas] = useState<Cita[]>([]);
   const [filtro, setFiltro] = useState<string>("todas");
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
   const cargarCitas = async () => {
     try {
@@ -88,7 +86,10 @@ const Citas = () => {
   return (
     <div className="citas-container">
       <div className="citas-header">
-        <h2>Mis Citas</h2>
+        <h2>Mis Citas Médicas</h2>
+        <p style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+          Tu médico agendará las citas para ti
+        </p>
       </div>
 
       <div className="filtros">
@@ -193,25 +194,6 @@ const Citas = () => {
           ))
         )}
       </div>
-
-      <button className="btn-nueva-cita" onClick={() => setMostrarFormulario(true)}>
-        <span>+</span> Agendar Nueva Cita
-      </button>
-
-      {/* Modal para agendar cita */}
-      {mostrarFormulario && (
-        <div className="modal-overlay" onClick={() => setMostrarFormulario(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <AgendarCita 
-              onCitaCreada={() => {
-                setMostrarFormulario(false);
-                cargarCitas();
-              }}
-              onCerrar={() => setMostrarFormulario(false)}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

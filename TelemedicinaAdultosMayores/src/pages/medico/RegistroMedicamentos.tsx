@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/medicamentos.css';
+import { obtenerPacientesDelMedico } from '../../services/medicoPaciente';
+import { crearMedicamento } from '../../services/medicamentos';
 
 type FormData = {
+  paciente_id: string;
   nombre: string;
   dosis: string;
   frecuencia: string;
@@ -13,6 +16,7 @@ type FormData = {
 
 const RegistroMedicamentos: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
+    paciente_id: '',
     nombre: '',
     dosis: '',
     frecuencia: 'Diario',
@@ -24,16 +28,20 @@ const RegistroMedicamentos: React.FC = () => {
 
   const [enviado, setEnviado] = useState<boolean>(false);
   const [errores, setErrores] = useState<Record<string, string>>({});
-  const [lista, setLista] = useState<Array<FormData & { id: number; justAdded?: boolean }>>([]);
-  const [nuevoId, setNuevoId] = useState<number | null>(null);
+  const [pacientes, setPacientes] = useState<any[]>([]);
 
   useEffect(() => {
-    if (nuevoId !== null) {
-      const t = setTimeout(() => setLista((prev: Array<FormData & { id: number; justAdded?: boolean }>) => prev.map((i) => i.id === nuevoId ? ({ ...i, justAdded: false }) : i)), 480);
-      const t2 = setTimeout(() => setNuevoId(null), 520);
-      return () => { clearTimeout(t); clearTimeout(t2); }
-    }
-  }, [nuevoId]);
+    const cargarPacientes = async () => {
+      const perfilJson = localStorage.getItem('usuario_perfil');
+      if (!perfilJson) return;
+      
+      const perfil = JSON.parse(perfilJson);
+      const pacientesData = await obtenerPacientesDelMedico(perfil.id);
+      setPacientes(pacientesData);
+    };
+    
+    cargarPacientes();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -42,33 +50,71 @@ const RegistroMedicamentos: React.FC = () => {
 
   const validar = () => {
     const newErrors: { [k: string]: string } = {};
+    if (!formData.paciente_id) newErrors.paciente_id = 'Debes seleccionar un paciente';
     if (!formData.nombre.trim()) newErrors.nombre = 'El nombre del medicamento es obligatorio';
     if (!formData.dosis.trim()) newErrors.dosis = 'La dosis es obligatoria';
     if (!formData.duracion.trim()) newErrors.duracion = 'La duración es obligatoria';
     return newErrors;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const v = validar();
     setErrores(v);
     if (Object.keys(v).length > 0) return;
 
-    // Agregar a la lista (simular persistencia)
-    const nuevo = { id: Date.now(), ...formData, justAdded: true };
-    setLista((prev: Array<FormData & { id: number; justAdded?: boolean }>) => [nuevo, ...prev]);
-    setNuevoId(nuevo.id);
+    try {
+      const perfilJson = localStorage.getItem('usuario_perfil');
+      if (!perfilJson) {
+        alert('Error: No se encontró el usuario');
+        return;
+      }
+      
+      const perfil = JSON.parse(perfilJson);
 
-    console.log('Medicamento registrado:', formData);
-    setEnviado(true);
+      console.log('Form Data:', formData);
+      console.log('Paciente seleccionado ID:', formData.paciente_id);
+      console.log('Lista de pacientes:', pacientes);
 
-    setTimeout(() => setEnviado(false), 3000);
-    setFormData({ nombre: '', dosis: '', frecuencia: 'Diario', horarios: '', duracion: '', unidad: 'días', indicaciones: '' });
+      const nuevoMedicamento = {
+        usuario_id: formData.paciente_id,
+        medico_id: perfil.id,
+        nombre: formData.nombre,
+        dosis: formData.dosis,
+        frecuencia: formData.frecuencia,
+        horarios: formData.horarios,
+        duracion: parseInt(formData.duracion),
+        unidad_duracion: formData.unidad as 'días' | 'semanas' | 'meses',
+        indicaciones: formData.indicaciones,
+        prescrito_por: `${perfil.nombre} ${perfil.apellido}`,
+        fecha_inicio: new Date().toISOString().split('T')[0]
+      };
+
+      console.log('Medicamento a enviar:', nuevoMedicamento);
+
+      const resultado = await crearMedicamento(nuevoMedicamento);
+      
+      if (resultado) {
+        setEnviado(true);
+        setTimeout(() => setEnviado(false), 3000);
+        setFormData({ 
+          paciente_id: '',
+          nombre: '', 
+          dosis: '', 
+          frecuencia: 'Diario', 
+          horarios: '', 
+          duracion: '', 
+          unidad: 'días', 
+          indicaciones: '' 
+        });
+      } else {
+        alert('Error al guardar el medicamento');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al guardar el medicamento');
+    }
   };
-
-  const handleEliminar = (id: number) => {
-    setLista((prev: Array<FormData & { id: number; justAdded?: boolean }>) => prev.filter((i) => i.id !== id));
-  }
 
   return (
     <div className="med-page">
@@ -84,6 +130,26 @@ const RegistroMedicamentos: React.FC = () => {
           {enviado && <div className="med-success toast toast-success">Medicamento registrado correctamente</div>}
 
           <form onSubmit={handleSubmit} className="med-form">
+            <div className="row">
+              <div className="col">
+                <label>Paciente*</label>
+                <select 
+                  name="paciente_id" 
+                  value={formData.paciente_id} 
+                  onChange={handleChange}
+                  style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd' }}
+                >
+                  <option value="">Selecciona un paciente</option>
+                  {pacientes.map((paciente) => (
+                    <option key={paciente.id} value={paciente.id}>
+                      {paciente.nombre} {paciente.apellido}
+                    </option>
+                  ))}
+                </select>
+                {errores.paciente_id && <p className="error-message">{errores.paciente_id}</p>}
+              </div>
+            </div>
+
             <div className="row">
               <div className="col">
                 <label>Nombre del medicamento*</label>
@@ -141,31 +207,19 @@ const RegistroMedicamentos: React.FC = () => {
 
             <div className="med-actions">
               <button className="btn btn-primary" type="submit">Guardar</button>
-              <button className="btn btn-ghost" type="button" onClick={() => setFormData({ nombre: '', dosis: '', frecuencia: 'Diario', horarios: '', duracion: '', unidad: 'días', indicaciones: '' })}>Limpiar</button>
+              <button className="btn btn-ghost" type="button" onClick={() => setFormData({ 
+                paciente_id: '',
+                nombre: '', 
+                dosis: '', 
+                frecuencia: 'Diario', 
+                horarios: '', 
+                duracion: '', 
+                unidad: 'días', 
+                indicaciones: '' 
+              })}>Limpiar</button>
             </div>
           </form>
         </section>
-
-        <aside className="med-list-card card fade-in-slow">
-          <h3>Medicamentos registrados ({lista.length})</h3>
-          {lista.length === 0 ? (
-            <p className="muted">No hay medicamentos registrados todavía.</p>
-          ) : (
-            <ul className="med-list">
-              {lista.map((item: FormData & { id: number; justAdded?: boolean }) => (
-                <li key={item.id} className={item.justAdded ? 'new' : ''}>
-                  <div>
-                    <strong>{item.nombre}</strong>
-                    <div className="muted small">{item.dosis} • {item.frecuencia} • {item.duracion} {item.unidad}</div>
-                  </div>
-                  <div>
-                    <button className="btn-sm btn-danger" onClick={() => handleEliminar(item.id)}>Eliminar</button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </aside>
       </main>
     </div>
   );

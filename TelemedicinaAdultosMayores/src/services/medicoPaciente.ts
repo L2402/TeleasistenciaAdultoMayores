@@ -33,6 +33,20 @@ export const obtenerMedicosDelPaciente = async (pacienteId: string): Promise<Med
   }
 }
 
+// Obtener pacientes asignados a un médico
+export const obtenerPacientesDelMedico = async (medicoId: string): Promise<any[]> => {
+  try {
+    const { data, error } = await supabase
+      .rpc('obtener_pacientes_medico', { medico_id_param: medicoId })
+
+    if (error) throw error
+    return Array.isArray(data) ? data : []
+  } catch (error: any) {
+    console.error('Error al obtener pacientes:', error.message)
+    return []
+  }
+}
+
 // Obtener todos los médicos disponibles (para asignar)
 export const obtenerTodosMedicos = async (): Promise<any[]> => {
   try {

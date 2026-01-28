@@ -2,7 +2,7 @@ import { supabase } from '../lib/supabase'
 
 export interface Cita {
   id: string
-  usuario_id: string
+  adulto_mayor_id: string
   medico_id: string
   fecha: string
   hora: string
@@ -15,22 +15,31 @@ export interface Cita {
     nombre: string
     apellido: string
   }
+  paciente?: {
+    nombre: string
+    apellido: string
+    correo: string
+  }
 }
 
-// Obtener citas del usuario actual
+// Obtener citas del usuario actual (adulto mayor)
 export const obtenerCitasUsuario = async (usuarioId: string): Promise<Cita[]> => {
   try {
     const { data, error } = await supabase
-      .from('citas')
-      .select(`
-        *,
-        medico:medico_id(nombre, apellido)
-      `)
-      .eq('usuario_id', usuarioId)
-      .order('fecha', { ascending: false })
+      .rpc('obtener_citas_paciente', { paciente_id_param: usuarioId })
 
     if (error) throw error
-    return data || []
+    
+    const citasArray = Array.isArray(data) ? data : []
+    
+    // Transformar datos para que coincidan con la interfaz Cita
+    return citasArray.map((cita: any) => ({
+      ...cita,
+      medico: {
+        nombre: cita.medico_nombre,
+        apellido: cita.medico_apellido
+      }
+    }))
   } catch (error: any) {
     console.error('Error al obtener citas:', error.message)
     return []
@@ -41,16 +50,21 @@ export const obtenerCitasUsuario = async (usuarioId: string): Promise<Cita[]> =>
 export const obtenerCitasMedico = async (medicoId: string): Promise<Cita[]> => {
   try {
     const { data, error } = await supabase
-      .from('citas')
-      .select(`
-        *,
-        usuario:usuario_id(nombre, apellido, correo)
-      `)
-      .eq('medico_id', medicoId)
-      .order('fecha', { ascending: false })
+      .rpc('obtener_citas_medico', { medico_id_param: medicoId })
 
     if (error) throw error
-    return data || []
+    
+    const citasArray = Array.isArray(data) ? data : []
+    
+    // Transformar datos para que coincidan con la interfaz Cita
+    return citasArray.map((cita: any) => ({
+      ...cita,
+      paciente: {
+        nombre: cita.paciente_nombre,
+        apellido: cita.paciente_apellido,
+        correo: cita.paciente_correo
+      }
+    }))
   } catch (error: any) {
     console.error('Error al obtener citas del médico:', error.message)
     return []

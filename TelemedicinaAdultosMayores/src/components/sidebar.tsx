@@ -22,6 +22,7 @@ const Sidebar = ({ rol }: SidebarProps) => {
       { icon: <Home size={20} />, text: "Inicio", path: "/home" },
       { icon: <Calendar size={20} />, text: "Mis citas", path: "/citas" },
       { icon: <HeartPulse size={20} />, text: "Monitoreo", path: "/monitoreo" },
+      { icon: <Pill size={20} />, text: "Medicamentos", path: "/medicamentos" },
       { icon: <MessageSquare size={20} />, text: "Mensajes", path: "/mensajes" },
     { icon: <Calendar size={20} />, text: "Historial", path: "/historial-sesiones" },
     { icon: <HeartPulse size={20} />, text: "Registro anímico", path: "/registro-animo" },

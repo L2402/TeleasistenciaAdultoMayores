@@ -1,35 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import '../../styles/registroUsuario.css';
-import { crearMedicamento, obtenerMedicamentos, desactivarMedicamento, Medicamento } from '../../services/medicamentos';
+import '../../styles/medicamentos.css';
+import { obtenerMedicamentos, Medicamento } from '../../services/medicamentos';
 
 const RegistroMedicamentos: React.FC = () => {
-  const [formData, setFormData] = useState({
-    nombre: '',
-    dosis: '',
-    frecuencia: 'Diario',
-    horarios: '',
-    duracion: '',
-    unidad: 'días',
-    indicaciones: ''
-  });
-
   const [medicamentos, setMedicamentos] = useState<Medicamento[]>([]);
   const [cargando, setCargando] = useState(true);
-  const [enviado, setEnviado] = useState<boolean>(false);
-  const [errores, setErrores] = useState<Record<string, string>>({});
+  const [error, setError] = useState<string | null>(null);
 
   // Cargar medicamentos al montar
   useEffect(() => {
     const cargarMedicamentos = async () => {
       try {
+        setCargando(true);
+        setError(null);
+        
         const perfilJson = localStorage.getItem('usuario_perfil');
-        if (!perfilJson) return;
+        if (!perfilJson) {
+          setError('No se encontró el usuario');
+          return;
+        }
         
         const perfil = JSON.parse(perfilJson);
         const meds = await obtenerMedicamentos(perfil.id);
         setMedicamentos(meds);
       } catch (error) {
         console.error('Error al cargar medicamentos:', error);
+        setError('Error al cargar medicamentos');
       } finally {
         setCargando(false);
       }
@@ -93,105 +89,92 @@ const RegistroMedicamentos: React.FC = () => {
   };
 
   return (
-    <div className="registro-container">
-      <h2 className="registro-title">Registro de Medicamentos</h2>
-      <div className="registro-card">
-        {enviado && <div className="success-message">✅ Medicamento registrado correctamente</div>}
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Nombre del medicamento*</label>
-            <input name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Ej: Paracetamol" />
-            {errores.nombre && <p className="error-message">{errores.nombre}</p>}
-          </div>
+    <div className="med-page">
+      <header className="med-hero">
+        <div className="med-inner container">
+          <h1>Mis Medicamentos</h1>
+          <p className="med-sub">Medicamentos prescritos por tu médico</p>
+        </div>
+      </header>
 
-          <div className="form-group">
-            <label>Dosis*</label>
-            <input name="dosis" value={formData.dosis} onChange={handleChange} placeholder="Ej: 500 mg" />
-            {errores.dosis && <p className="error-message">{errores.dosis}</p>}
+      <main className="med-content container">
+        {cargando ? (
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <p>Cargando medicamentos...</p>
           </div>
-
-          <div className="form-group">
-            <label>Frecuencia</label>
-            <select name="frecuencia" value={formData.frecuencia} onChange={handleChange}>
-              <option>Diario</option>
-              <option>Cada 8 horas</option>
-              <option>Cada 12 horas</option>
-              <option>Según indicación</option>
-            </select>
+        ) : error ? (
+          <div style={{ textAlign: 'center', padding: '2rem', color: '#b91c1c' }}>
+            <p>{error}</p>
           </div>
-
-          <div className="form-group">
-            <label>Horarios (opcional)</label>
-            <input name="horarios" value={formData.horarios} onChange={handleChange} placeholder="08:00, 14:00, 20:00" />
+        ) : medicamentos.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+            <p>No tienes medicamentos prescritos aún</p>
           </div>
-
-          <div className="form-group">
-            <label>Duración*</label>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <input name="duracion" value={formData.duracion} onChange={handleChange} placeholder="Ej: 7" />
-              <select name="unidad" value={formData.unidad} onChange={handleChange}>
-                <option>días</option>
-                <option>semanas</option>
-                <option>meses</option>
-              </select>
-            </div>
-            {errores.duracion && <p className="error-message">{errores.duracion}</p>}
-          </div>
-
-          <div className="form-group">
-            <label>Indicaciones del médico (opcional)</label>
-            <textarea name="indicaciones" value={formData.indicaciones} onChange={handleChange} rows={4} />
-          </div>
-
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button className="btn-primary" type="submit">Guardar</button>
-            <button className="btn-secondary" type="button" onClick={() => setFormData({ nombre: '', dosis: '', frecuencia: 'Diario', horarios: '', duracion: '', unidad: 'días', indicaciones: '' })}>Limpiar</button>
-          </div>
-        </form>
-      </div>
-
-      <h3 style={{marginTop: '2rem', marginBottom: '1rem'}}>Medicamentos registrados</h3>
-      {cargando && <p>Cargando medicamentos...</p>}
-      {medicamentos.length === 0 && !cargando && <p>No hay medicamentos registrados</p>}
-      
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#f0f0f0', borderBottom: '2px solid #ddd' }}>
-              <th style={{ padding: '0.75rem', textAlign: 'left' }}>Medicamento</th>
-              <th style={{ padding: '0.75rem', textAlign: 'left' }}>Dosis</th>
-              <th style={{ padding: '0.75rem', textAlign: 'left' }}>Frecuencia</th>
-              <th style={{ padding: '0.75rem', textAlign: 'left' }}>Duración</th>
-              <th style={{ padding: '0.75rem', textAlign: 'center' }}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
+        ) : (
+          <div style={{ display: 'grid', gap: '1rem' }}>
             {medicamentos.map((med) => (
-              <tr key={med.id} style={{ borderBottom: '1px solid #ddd' }}>
-                <td style={{ padding: '0.75rem' }}>{med.nombre}</td>
-                <td style={{ padding: '0.75rem' }}>{med.dosis}</td>
-                <td style={{ padding: '0.75rem' }}>{med.frecuencia}</td>
-                <td style={{ padding: '0.75rem' }}>{med.duracion} {med.unidad_duracion}</td>
-                <td style={{ padding: '0.75rem', textAlign: 'center' }}>
-                  <button 
-                    onClick={() => handleEliminarMedicamento(med.id)}
-                    style={{
-                      backgroundColor: '#ef4444',
-                      color: 'white',
-                      border: 'none',
-                      padding: '0.5rem 1rem',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
+              <div key={med.id} className="med-item-card card" style={{ 
+                padding: '1.5rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#111827' }}>{med.nombre}</h3>
+                    {med.medico && (
+                      <p style={{ margin: '0.25rem 0', color: '#6b7280', fontSize: '0.875rem' }}>
+                        Prescrito por: Dr(a). {med.medico.nombre} {med.medico.apellido}
+                      </p>
+                    )}
+                    {med.fecha_inicio && (
+                      <p style={{ margin: '0.25rem 0', color: '#6b7280', fontSize: '0.875rem' }}>
+                        Desde: {new Date(med.fecha_inicio).toLocaleDateString('es-ES')}
+                      </p>
+                    )}
+                  </div>
+                  <span style={{ 
+                    padding: '0.25rem 0.75rem', 
+                    backgroundColor: '#10b981', 
+                    color: 'white', 
+                    borderRadius: '9999px',
+                    fontSize: '0.875rem'
+                  }}>
+                    Activo
+                  </span>
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+                  <div>
+                    <p style={{ margin: 0, color: '#6b7280', fontSize: '0.875rem' }}>Dosis</p>
+                    <p style={{ margin: '0.25rem 0', fontWeight: 500 }}>{med.dosis}</p>
+                  </div>
+                  <div>
+                    <p style={{ margin: 0, color: '#6b7280', fontSize: '0.875rem' }}>Frecuencia</p>
+                    <p style={{ margin: '0.25rem 0', fontWeight: 500 }}>{med.frecuencia}</p>
+                  </div>
+                  {med.horarios && (
+                    <div>
+                      <p style={{ margin: 0, color: '#6b7280', fontSize: '0.875rem' }}>Horarios</p>
+                      <p style={{ margin: '0.25rem 0', fontWeight: 500 }}>{med.horarios}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p style={{ margin: 0, color: '#6b7280', fontSize: '0.875rem' }}>Duración</p>
+                    <p style={{ margin: '0.25rem 0', fontWeight: 500 }}>{med.duracion} {med.unidad_duracion}</p>
+                  </div>
+                </div>
+                
+                {med.indicaciones && (
+                  <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '4px' }}>
+                    <p style={{ margin: 0, color: '#6b7280', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Indicaciones</p>
+                    <p style={{ margin: 0 }}>{med.indicaciones}</p>
+                  </div>
+                )}
+              </div>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 };

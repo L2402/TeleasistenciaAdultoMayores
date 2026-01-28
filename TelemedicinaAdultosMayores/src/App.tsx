@@ -12,10 +12,14 @@ import RecuperarPassword from "./pages/RecuperarPassword/RecuperarPassword";
 // páginas del adulto mayor
 import HomeAdulto from "./pages/adultoMayor/HomeAdulto";
 import Citas from "./pages/adultoMayor/Citas";
+
+// Importación específica para médico
+import CitasMedico from "./pages/medico/CitasMedico";
 import Monitoreo from "./pages/adultoMayor/Monitoreo";
 import Mensajes from "./pages/adultoMayor/Mensajes";
 import Perfil from "./pages/adultoMayor/Perfil";
 import HistorialSesiones from "./pages/adultoMayor/HistorialSesiones";
+import RegistroMedicamentosAdulto from "./pages/adultoMayor/RegistroMedicamentos";
 import RegistroMedicamentos from "./pages/medico/RegistroMedicamentos";
 import Incidencias from "./pages/adultoMayor/Incidencias";
 import RegistroAnimo from "./pages/adultoMayor/RegistroAnimo";
@@ -68,6 +72,7 @@ const App = () => {
                   <Route path="/mensajes" element={<Mensajes />} />
                   <Route path="/incidencias" element={<Incidencias />} />
                   <Route path="/registro-animo" element={<RegistroAnimo />} />
+                  <Route path="/medicamentos" element={<RegistroMedicamentosAdulto />} />
                   <Route path="/kyc" element={<KYC />} />
                   <Route path="/historial-sesiones" element={<HistorialSesiones />} />
                   <Route path="/perfil" element={<Perfil />} />
@@ -78,6 +83,7 @@ const App = () => {
                 <>
                   <Route path="/home" element={<PanelMedico />} />
                   <Route path="/usuarios" element={<Pacientes />} />
+                  <Route path="/citas" element={<CitasMedico />} />
                   <Route path="/reportes" element={<Reportes />} />
                   <Route path="/medicamentos" element={<RegistroMedicamentos />} />
                 </>

@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 export interface Medicamento {
   id: string
   usuario_id: string
+  medico_id?: string
   nombre: string
   dosis: string
   frecuencia: string
@@ -15,20 +16,30 @@ export interface Medicamento {
   activo: boolean
   created_at: string
   updated_at: string
+  medico?: {
+    nombre: string
+    apellido: string
+  }
 }
 
-// Obtener medicamentos del usuario
+// Obtener medicamentos del usuario con información del médico
 export const obtenerMedicamentos = async (usuarioId: string): Promise<Medicamento[]> => {
   try {
     const { data, error } = await supabase
-      .from('medicamentos')
-      .select('*')
-      .eq('usuario_id', usuarioId)
-      .eq('activo', true)
-      .order('created_at', { ascending: false })
+      .rpc('obtener_medicamentos_paciente', { paciente_id_param: usuarioId })
 
     if (error) throw error
-    return data || []
+    
+    const medicamentosArray = Array.isArray(data) ? data : []
+    
+    // Transformar datos para incluir info del médico
+    return medicamentosArray.map((med: any) => ({
+      ...med,
+      medico: med.medico_id ? {
+        nombre: med.medico_nombre,
+        apellido: med.medico_apellido
+      } : undefined
+    }))
   } catch (error: any) {
     console.error('Error al obtener medicamentos:', error.message)
     return []
