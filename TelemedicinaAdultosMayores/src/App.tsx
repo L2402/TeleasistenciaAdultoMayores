@@ -16,7 +16,7 @@ import Citas from "./pages/adultoMayor/Citas";
 // Importación específica para médico
 import CitasMedico from "./pages/medico/CitasMedico";
 import Monitoreo from "./pages/adultoMayor/Monitoreo";
-import Mensajes from "./pages/adultoMayor/Mensajes";
+import Mensajes from "./components/Mensajes";
 import Perfil from "./pages/adultoMayor/Perfil";
 import HistorialSesiones from "./pages/adultoMayor/HistorialSesiones";
 import RegistroMedicamentosAdulto from "./pages/adultoMayor/RegistroMedicamentos";
@@ -89,6 +89,7 @@ const App = () => {
                   <Route path="/citas" element={<CitasMedico />} />
                   <Route path="/reportes" element={<Reportes />} />
                   <Route path="/medicamentos" element={<RegistroMedicamentos />} />
+                  <Route path="/mensajes" element={<Mensajes />} />
                 </>
               )}
 
@@ -98,6 +99,7 @@ const App = () => {
                   <Route path="/adultos" element={<BuscarAdultos />} />
                   <Route path="/citas" element={<CitasCuidador />} />
                   <Route path="/medicamentos" element={<MedicamentosCuidador />} />
+                  <Route path="/mensajes" element={<Mensajes />} />
                 </>
               )}
 
